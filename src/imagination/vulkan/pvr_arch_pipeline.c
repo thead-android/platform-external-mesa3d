@@ -35,6 +35,7 @@
 #include "compiler/shader_enums.h"
 #include "hwdef/rogue_hw_utils.h"
 #include "nir/nir.h"
+#include "nir/nir_builder.h"
 #include "nir/nir_lower_blend.h"
 #include "pco/pco.h"
 #include "pco/pco_data.h"
@@ -918,6 +919,46 @@ static void pvr_pipeline_finish(struct pvr_device *device,
 static void pvr_early_init_shader_data(pco_data *data,
                                        nir_shader *nir,
                                        const void *pCreateInfo);
+
+static bool pvr_fold_static_fs_meta(nir_builder *b,
+                                    nir_intrinsic_instr *intr,
+                                    void *data)
+{
+   if (intr->intrinsic != nir_intrinsic_load_fs_meta_pco)
+      return false;
+
+   b->cursor = nir_before_instr(&intr->instr);
+   nir_def_rewrite_uses(&intr->def, nir_imm_int(b, *(const uint32_t *)data));
+   nir_instr_remove(&intr->instr);
+   return true;
+}
+
+static void pvr_specialize_static_fs_meta(
+   nir_shader *nir, const struct vk_graphics_pipeline_state *state)
+{
+   /* Leave dynamic pipelines and incomplete pipeline-library state untouched.
+    * This is specialization of fixed pipeline values, not disabling MSAA,
+    * alpha-to-coverage, sample masks or color writes.
+    */
+   if (nir->info.stage != MESA_SHADER_FRAGMENT || nir->info.internal ||
+       !state->ms || !state->cb ||
+       BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_ALPHA_TO_ONE_ENABLE) ||
+       BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_ALPHA_TO_COVERAGE_ENABLE) ||
+       BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_SAMPLE_MASK) ||
+       BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_CB_COLOR_WRITE_ENABLES))
+      return;
+
+   /* Same packing as PVR_BUFFER_TYPE_FS_META in pvr_arch_cmd_buffer.c. */
+   uint32_t meta = ((uint32_t)state->ms->sample_mask << 9) |
+                   ((uint32_t)state->cb->color_write_enables << 1);
+   if (state->ms->alpha_to_one_enable)
+      meta |= BITFIELD_BIT(0);
+   if (state->ms->alpha_to_coverage_enable)
+      meta |= BITFIELD_BIT(25);
+
+   nir_shader_intrinsics_pass(nir, pvr_fold_static_fs_meta,
+                              nir_metadata_control_flow, &meta);
+}
 
 static void
 pvr_preprocess_shader_data(pco_data *data,
@@ -2933,6 +2974,8 @@ pvr_graphics_pipeline_compile(struct pvr_device *const device,
                lookup_ycbcr_conversion,
                &ycbcr_state);
       pco_lower_nir(pco_ctx, nir_shaders[stage], &shader_data[stage]);
+
+      pvr_specialize_static_fs_meta(nir_shaders[stage], state);
 
       pco_postprocess_nir(pco_ctx, nir_shaders[stage], &shader_data[stage]);
 
