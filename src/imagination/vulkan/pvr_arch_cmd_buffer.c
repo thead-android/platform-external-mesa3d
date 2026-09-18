@@ -24,9 +24,12 @@
 #include "pvr_cmd_buffer.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <vulkan/vulkan.h>
@@ -81,6 +84,19 @@
 #include "vk_pipeline_layout.h"
 #include "vk_synchronization.h"
 #include "vk_util.h"
+
+static bool pvr_trace_render_enabled(void)
+{
+   const char *value = getenv("PVR_TRACE_RENDER");
+
+   return value && value[0] && strcmp(value, "0");
+}
+
+#define PVR_TRACE_RENDER(...)                 \
+   do {                                      \
+      if (pvr_trace_render_enabled())        \
+         fprintf(stderr, __VA_ARGS__);       \
+   } while (0)
 
 /* Structure used to pass data into pvr_compute_generate_control_stream()
  * function.
@@ -528,6 +544,47 @@ pvr_cmd_buffer_upload_pds_data(struct pvr_cmd_buffer *const cmd_buffer,
                                          pds_upload_out);
 }
 
+static bool pvr_eot_program_cache_entry_matches(
+   const struct pvr_eot_program_cache_entry *entry,
+   const struct pvr_eot_props *props)
+{
+   STATIC_ASSERT(ROGUE_NUM_PBESTATE_STATE_WORDS ==
+                 ARRAY_SIZE(entry->state_words[0]));
+
+   return entry->emit_count == props->emit_count &&
+          entry->msaa_samples == props->msaa_samples &&
+          entry->num_output_regs == props->num_output_regs &&
+          memcmp(entry->state_words,
+                 props->state_words,
+                 props->emit_count * ROGUE_NUM_PBESTATE_STATE_WORDS *
+                    sizeof(uint32_t)) == 0 &&
+          memcmp(entry->tile_buffer_addrs,
+                 props->tile_buffer_addrs,
+                 sizeof(entry->tile_buffer_addrs)) == 0;
+}
+
+static void pvr_eot_program_cache_entry_init(
+   struct pvr_eot_program_cache_entry *entry,
+   const struct pvr_eot_props *props,
+   uint32_t usc_temp_count,
+   struct pvr_suballoc_bo *usc_program,
+   const struct pvr_pds_upload *pds_pixel_event_program)
+{
+   entry->emit_count = props->emit_count;
+   memcpy(entry->state_words,
+          props->state_words,
+          props->emit_count * ROGUE_NUM_PBESTATE_STATE_WORDS *
+             sizeof(uint32_t));
+   entry->msaa_samples = props->msaa_samples;
+   entry->num_output_regs = props->num_output_regs;
+   memcpy(entry->tile_buffer_addrs,
+          props->tile_buffer_addrs,
+          sizeof(entry->tile_buffer_addrs));
+   entry->usc_temp_count = usc_temp_count;
+   entry->usc_program = usc_program;
+   entry->pds_pixel_event_program = *pds_pixel_event_program;
+}
+
 /* pbe_cs_words must be an array of length emit_count with
  * ROGUE_NUM_PBESTATE_STATE_WORDS entries
  */
@@ -539,6 +596,8 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
    unsigned pixel_output_width,
    struct pvr_pds_upload *const pds_upload_out)
 {
+   assert(emit_count > 0 && emit_count <= PVR_MAX_COLOR_ATTACHMENTS);
+
    struct pvr_pds_event_program pixel_event_program = {
       /* No data to DMA, just a DOUTU needed. */
       .num_emit_word_pairs = 0,
@@ -581,6 +640,19 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
          props.msaa_samples = 1;
    }
 
+   simple_mtx_lock(&device->eot_program_cache_mtx);
+
+   for (uint32_t i = 0; i < device->eot_program_cache_count; i++) {
+      const struct pvr_eot_program_cache_entry *entry =
+         &device->eot_program_cache[i];
+
+      if (pvr_eot_program_cache_entry_matches(entry, &props)) {
+         *pds_upload_out = entry->pds_pixel_event_program;
+         simple_mtx_unlock(&device->eot_program_cache_mtx);
+         return VK_SUCCESS;
+      }
+   }
+
    eot =
       pvr_usc_eot(device->pdevice->pco_ctx, &props, &device->pdevice->dev_info);
    usc_temp_count = pco_shader_data(eot)->common.temps;
@@ -593,8 +665,10 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
 
    ralloc_free(eot);
 
-   if (result != VK_SUCCESS)
+   if (result != VK_SUCCESS) {
+      simple_mtx_unlock(&device->eot_program_cache_mtx);
       return result;
+   }
 
    pvr_pds_setup_doutu(&pixel_event_program.task_control,
                        usc_eot_program->dev_addr.addr,
@@ -631,11 +705,29 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
 
    vk_free(allocator, staging_buffer);
 
+   if (result == VK_SUCCESS &&
+       device->eot_program_cache_count < PVR_EOT_PROGRAM_CACHE_SIZE) {
+      struct pvr_eot_program_cache_entry *entry =
+         &device->eot_program_cache[device->eot_program_cache_count++];
+
+      /* Cache entries own these allocations until device destruction. */
+      list_del(&usc_eot_program->link);
+      list_del(&pds_upload_out->pvr_bo->link);
+      pvr_eot_program_cache_entry_init(entry,
+                                       &props,
+                                       usc_temp_count,
+                                       usc_eot_program,
+                                       pds_upload_out);
+   }
+
+   simple_mtx_unlock(&device->eot_program_cache_mtx);
+
    return result;
 
 err_free_usc_pixel_program:
    list_del(&usc_eot_program->link);
    pvr_bo_suballoc_free(usc_eot_program);
+   simple_mtx_unlock(&device->eot_program_cache_mtx);
 
    return result;
 }
@@ -2841,6 +2933,10 @@ void PVR_PER_ARCH(CmdBindPipeline)(VkCommandBuffer commandBuffer,
    VK_FROM_HANDLE(pvr_cmd_buffer, cmd_buffer, commandBuffer);
    VK_FROM_HANDLE(pvr_pipeline, pipeline, _pipeline);
 
+   PVR_TRACE_RENDER("PVRTRACE CmdBindPipeline bind_point=%u pipeline=%p\n",
+                    pipelineBindPoint,
+                    (void *)pipeline);
+
    switch (pipelineBindPoint) {
    case VK_PIPELINE_BIND_POINT_COMPUTE:
       pvr_cmd_bind_compute_pipeline(to_pvr_compute_pipeline(pipeline),
@@ -3946,6 +4042,27 @@ void PVR_PER_ARCH(CmdBeginRenderPass2)(
    struct pvr_cmd_buffer_state *state = &cmd_buffer->state;
    VkResult result;
 
+   PVR_TRACE_RENDER(
+      "PVRTRACE CmdBeginRenderPass2 area=%d,%d %ux%u clears=%u"
+      " clear0=%g,%g,%g,%g\n",
+      pRenderPassBeginInfo->renderArea.offset.x,
+      pRenderPassBeginInfo->renderArea.offset.y,
+      pRenderPassBeginInfo->renderArea.extent.width,
+      pRenderPassBeginInfo->renderArea.extent.height,
+      pRenderPassBeginInfo->clearValueCount,
+      pRenderPassBeginInfo->clearValueCount
+         ? pRenderPassBeginInfo->pClearValues[0].color.float32[0]
+         : 0.0,
+      pRenderPassBeginInfo->clearValueCount
+         ? pRenderPassBeginInfo->pClearValues[0].color.float32[1]
+         : 0.0,
+      pRenderPassBeginInfo->clearValueCount
+         ? pRenderPassBeginInfo->pClearValues[0].color.float32[2]
+         : 0.0,
+      pRenderPassBeginInfo->clearValueCount
+         ? pRenderPassBeginInfo->pClearValues[0].color.float32[3]
+         : 0.0);
+
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 
    assert(!state->render_pass_info.pass);
@@ -4104,8 +4221,8 @@ static VkResult pvr_dynamic_rendering_output_attachments_setup(
    struct pvr_dynamic_render_info *dr_info,
    uint32_t *attach_idx)
 {
-   VkFormat attachment_formats[pRenderingInfo->colorAttachmentCount];
-   uint32_t mrt_attachment_map[pRenderingInfo->colorAttachmentCount];
+   VkFormat attachment_formats[PVR_MAX_COLOR_ATTACHMENTS];
+   uint32_t mrt_attachment_map[PVR_MAX_COLOR_ATTACHMENTS];
    uint32_t mrt_count = 0, eot_mrt_count = 0, eot_mrt_idx = 0,
             eot_surface_idx = 0, color_idx = 0, pbe_emits = 0,
             init_setup_idx = 0;
@@ -4772,6 +4889,39 @@ void PVR_PER_ARCH(CmdBeginRendering)(VkCommandBuffer commandBuffer,
    bool resume, suspend;
    VkResult result;
 
+   PVR_TRACE_RENDER(
+      "PVRTRACE CmdBeginRendering area=%d,%d %ux%u layers=%u colors=%u"
+      " flags=0x%x first_load=%u first_store=%u first_layout=%u"
+      " first_clear=%g,%g,%g,%g\n",
+      pRenderingInfo->renderArea.offset.x,
+      pRenderingInfo->renderArea.offset.y,
+      pRenderingInfo->renderArea.extent.width,
+      pRenderingInfo->renderArea.extent.height,
+      pRenderingInfo->layerCount,
+      pRenderingInfo->colorAttachmentCount,
+      pRenderingInfo->flags,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].loadOp
+         : 0,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].storeOp
+         : 0,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].imageLayout
+         : 0,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].clearValue.color.float32[0]
+         : 0.0,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].clearValue.color.float32[1]
+         : 0.0,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].clearValue.color.float32[2]
+         : 0.0,
+      pRenderingInfo->colorAttachmentCount
+         ? pRenderingInfo->pColorAttachments[0].clearValue.color.float32[3]
+         : 0.0);
+
    /* TODO: Check not in renderpess? */
 
    suspend = pRenderingInfo->flags & VK_RENDERING_SUSPENDING_BIT_KHR;
@@ -4901,6 +5051,8 @@ void PVR_PER_ARCH(CmdEndRendering)(VkCommandBuffer commandBuffer)
    struct pvr_cmd_buffer_state *state = &cmd_buffer->state;
    VkResult result;
 
+   PVR_TRACE_RENDER("PVRTRACE CmdEndRendering\n");
+
    if (state->current_sub_cmd && state->current_sub_cmd->is_suspend) {
       return;
    }
@@ -4932,8 +5084,8 @@ static void pvr_cmd_buffer_state_from_dynamic_inheritance(
                             VK_FORMAT_UNDEFINED;
    const bool has_depth = inheritance_info->depthAttachmentFormat !=
                           VK_FORMAT_UNDEFINED;
-   VkFormat attachment_formats[inheritance_info->colorAttachmentCount];
-   uint32_t mrt_attachment_map[inheritance_info->colorAttachmentCount];
+   VkFormat attachment_formats[PVR_MAX_COLOR_ATTACHMENTS];
+   uint32_t mrt_attachment_map[PVR_MAX_COLOR_ATTACHMENTS];
    struct pvr_device *const device = cmd_buffer->device;
    struct pvr_dynamic_render_info *dr_info;
    uint32_t attach_idx = 0, mrt_count = 0;
@@ -8658,13 +8810,22 @@ void PVR_PER_ARCH(CmdDraw)(VkCommandBuffer commandBuffer,
    struct pvr_cmd_buffer_state *state = &cmd_buffer->state;
    VkResult result;
 
+   PVR_TRACE_RENDER("PVRTRACE CmdDraw vertices=%u instances=%u first=%u"
+                    " first_instance=%u\n",
+                    vertexCount,
+                    instanceCount,
+                    firstVertex,
+                    firstInstance);
+
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 
    pvr_update_draw_state(state, &draw_state);
 
    result = pvr_validate_draw_state(cmd_buffer);
-   if (result != VK_SUCCESS)
+   if (result != VK_SUCCESS) {
+      PVR_TRACE_RENDER("PVRTRACE CmdDraw validation failed=%d\n", result);
       return;
+   }
 
    /* Write the VDM control stream for the primitive. */
    pvr_emit_vdm_index_list(cmd_buffer,
@@ -8699,13 +8860,24 @@ void PVR_PER_ARCH(CmdDrawIndexed)(VkCommandBuffer commandBuffer,
    struct pvr_cmd_buffer_state *state = &cmd_buffer->state;
    VkResult result;
 
+   PVR_TRACE_RENDER("PVRTRACE CmdDrawIndexed indices=%u instances=%u"
+                    " first=%u vertex_offset=%d first_instance=%u\n",
+                    indexCount,
+                    instanceCount,
+                    firstIndex,
+                    vertexOffset,
+                    firstInstance);
+
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 
    pvr_update_draw_state(state, &draw_state);
 
    result = pvr_validate_draw_state(cmd_buffer);
-   if (result != VK_SUCCESS)
+   if (result != VK_SUCCESS) {
+      PVR_TRACE_RENDER("PVRTRACE CmdDrawIndexed validation failed=%d\n",
+                       result);
       return;
+   }
 
    /* Write the VDM control stream for the primitive. */
    pvr_emit_vdm_index_list(cmd_buffer,
@@ -8738,6 +8910,12 @@ void PVR_PER_ARCH(CmdDrawIndexedIndirect)(VkCommandBuffer commandBuffer,
       &cmd_buffer->vk.dynamic_graphics_state;
    VK_FROM_HANDLE(pvr_buffer, buffer, _buffer);
    VkResult result;
+
+   PVR_TRACE_RENDER("PVRTRACE CmdDrawIndexedIndirect offset=%" PRIu64
+                    " count=%u stride=%u\n",
+                    offset,
+                    drawCount,
+                    stride);
 
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 
@@ -8778,6 +8956,12 @@ void PVR_PER_ARCH(CmdDrawIndirect)(VkCommandBuffer commandBuffer,
       &cmd_buffer->vk.dynamic_graphics_state;
    VkResult result;
 
+   PVR_TRACE_RENDER("PVRTRACE CmdDrawIndirect offset=%" PRIu64
+                    " count=%u stride=%u\n",
+                    offset,
+                    drawCount,
+                    stride);
+
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 
    pvr_update_draw_state(state, &draw_state);
@@ -8808,6 +8992,8 @@ void PVR_PER_ARCH(CmdEndRenderPass2)(VkCommandBuffer commandBuffer,
    struct pvr_image_view **attachments;
    VkClearValue *clear_values;
    VkResult result;
+
+   PVR_TRACE_RENDER("PVRTRACE CmdEndRenderPass2\n");
 
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 
@@ -8855,8 +9041,11 @@ pvr_execute_deferred_cmd_buffer(struct pvr_cmd_buffer *cmd_buffer,
             prim_scissor_elems + cmd->dbsc.state.scissor_index;
          const uint32_t db_idx =
             prim_db_elems + cmd->dbsc.state.depthbias_index;
-         const uint32_t num_dwords =
-            pvr_cmd_length(TA_STATE_HEADER) + pvr_cmd_length(TA_STATE_ISPDBSC);
+         enum {
+            num_dwords =
+               pvr_cmd_length(TA_STATE_HEADER) +
+               pvr_cmd_length(TA_STATE_ISPDBSC),
+         };
          struct pvr_suballoc_bo *suballoc_bo;
          uint32_t ppp_state[num_dwords];
          VkResult result;
@@ -9135,6 +9324,9 @@ void PVR_PER_ARCH(CmdExecuteCommands)(VkCommandBuffer commandBuffer,
    struct pvr_cmd_buffer_state *state = &cmd_buffer->state;
    struct pvr_cmd_buffer *last_cmd_buffer;
    VkResult result;
+
+   PVR_TRACE_RENDER("PVRTRACE CmdExecuteCommands count=%u\n",
+                    commandBufferCount);
 
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
 

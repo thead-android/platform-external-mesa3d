@@ -40,6 +40,10 @@
 #include <string.h>
 #include <vulkan/vulkan.h>
 
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+#include <vndk/hardware_buffer.h>
+#endif
+
 #include "hwdef/pvr_hw_utils.h"
 #include "hwdef/rogue_hw_utils.h"
 #include "pvr_bo.h"
@@ -62,9 +66,11 @@
 #include "util/log.h"
 #include "util/macros.h"
 #include "util/mesa-sha1.h"
+#include "util/os_file.h"
 #include "util/os_misc.h"
 #include "util/u_math.h"
 #include "vk_device_memory.h"
+#include "vk_android.h"
 #include "vk_extensions.h"
 #include "vk_log.h"
 #include "vk_object.h"
@@ -197,6 +203,11 @@ VkResult pvr_AllocateMemory(VkDevice _device,
                             VkDeviceMemory *pMem)
 {
    const VkImportMemoryFdInfoKHR *fd_info = NULL;
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   const VkImportAndroidHardwareBufferInfoANDROID *ahb_info = NULL;
+   VkImportMemoryFdInfoKHR ahb_fd_info = { 0 };
+   int ahb_fd = -1;
+#endif
    VK_FROM_HANDLE(pvr_device, device, _device);
    enum pvr_winsys_bo_type type = PVR_WINSYS_BO_TYPE_GPU;
    struct pvr_device_memory *mem;
@@ -232,6 +243,11 @@ VkResult pvr_AllocateMemory(VkDevice _device,
       case VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR:
          fd_info = (void *)ext;
          break;
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      case VK_STRUCTURE_TYPE_IMPORT_ANDROID_HARDWARE_BUFFER_INFO_ANDROID:
+         ahb_info = (void *)ext;
+         break;
+#endif
       case VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO:
          break;
       case VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO:
@@ -247,6 +263,30 @@ VkResult pvr_AllocateMemory(VkDevice _device,
          break;
       }
    }
+
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   if (ahb_info) {
+      const native_handle_t *handle =
+         AHardwareBuffer_getNativeHandle(ahb_info->buffer);
+      if (!handle || handle->numFds < 1) {
+         result = vk_error(device, VK_ERROR_INVALID_EXTERNAL_HANDLE);
+         goto err_vk_device_memory_destroy;
+      }
+
+      ahb_fd = os_dupfd_cloexec(handle->data[0]);
+      if (ahb_fd < 0) {
+         result = vk_error(device, VK_ERROR_OUT_OF_HOST_MEMORY);
+         goto err_vk_device_memory_destroy;
+      }
+
+      ahb_fd_info = (VkImportMemoryFdInfoKHR){
+         .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR,
+         .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
+         .fd = ahb_fd,
+      };
+      fd_info = &ahb_fd_info;
+   }
+#endif
 
    if (fd_info && fd_info->handleType) {
       assert(
@@ -288,6 +328,9 @@ VkResult pvr_AllocateMemory(VkDevice _device,
        * If the import fails, we leave the file descriptor open.
        */
       close(fd_info->fd);
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      ahb_fd = -1;
+#endif
    } else {
       /* Align physical allocations to the page size of the heap that will be
        * used when binding device memory (see pvr_bind_memory()) to ensure the
@@ -317,6 +360,10 @@ VkResult pvr_AllocateMemory(VkDevice _device,
    return VK_SUCCESS;
 
 err_vk_device_memory_destroy:
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   if (ahb_fd >= 0)
+      close(ahb_fd);
+#endif
    vk_device_memory_destroy(&device->vk, pAllocator, &mem->vk);
 
    return result;

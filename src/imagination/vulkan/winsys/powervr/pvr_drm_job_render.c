@@ -36,6 +36,7 @@
 #include "pvr_drm_job_render.h"
 #include "pvr_winsys.h"
 #include "pvr_winsys_helper.h"
+#include "util/log.h"
 #include "util/macros.h"
 #include "vk_alloc.h"
 #include "vk_drm_syncobj.h"
@@ -314,11 +315,11 @@ VkResult pvr_drm_render_target_dataset_create(
 
    struct drm_pvr_ioctl_create_hwrt_dataset_args args = {
       .geom_data_args = {
-         .tpc_dev_addr = create_info->tpc_dev_addr.addr,
+         .tpc_dev_addr = create_info->tpc_dev_addrs[0].addr,
          .tpc_size = create_info->tpc_size,
          .tpc_stride = create_info->tpc_stride,
-         .vheap_table_dev_addr = create_info->vheap_table_dev_addr.addr,
-         .rtc_dev_addr = create_info->rtc_dev_addr.addr,
+         .vheap_table_dev_addr = create_info->vheap_table_dev_addrs[0].addr,
+         .rtc_dev_addr = create_info->rtc_dev_addrs[0].addr,
       },
 
       .rt_data_args = {
@@ -363,7 +364,7 @@ VkResult pvr_drm_render_target_dataset_create(
    struct pvr_drm_winsys_rt_dataset *drm_rt_dataset;
    VkResult result;
 
-   STATIC_ASSERT(ARRAY_SIZE(args.rt_data_args) ==
+   STATIC_ASSERT(ARRAY_SIZE(args.rt_data_args) <=
                  ARRAY_SIZE(create_info->rt_datas));
 
    drm_rt_dataset = vk_zalloc(ws->alloc,
@@ -386,6 +387,7 @@ VkResult pvr_drm_render_target_dataset_create(
 
    drm_rt_dataset->handle = args.handle;
    drm_rt_dataset->base.ws = ws;
+   drm_rt_dataset->base.rt_data_count = ARRAY_SIZE(args.rt_data_args);
 
    *rt_dataset_out = &drm_rt_dataset->base;
 
@@ -621,10 +623,44 @@ VkResult pvr_drm_winsys_render_submit(
    if (submit_info->has_fragment_job)
       jobs_args[2].sync_ops.count = num_frag_syncs;
 
-   /* Returns VK_ERROR_OUT_OF_DEVICE_MEMORY to match pvrsrv. */
-   return pvr_ioctlf(drm_ws->base.render_fd,
-                     DRM_IOCTL_PVR_SUBMIT_JOBS,
-                     &args,
-                     VK_ERROR_OUT_OF_DEVICE_MEMORY,
-                     "Failed to submit render job");
+   /* Keep the raw errno visible while bringing up new KMD/FW combinations.
+    * pvr_ioctlf() deliberately maps every submit failure to OODM, which hides
+    * the validation error that is useful here.
+    */
+   const int ret = drmIoctl(drm_ws->base.render_fd,
+                            DRM_IOCTL_PVR_SUBMIT_JOBS,
+                            &args);
+   if (ret) {
+      const int err = errno;
+
+      mesa_loge("PVRDRM render submit failed: errno=%d (%s) jobs=%u "
+                "ctx=%u rt=%u data=%u fragment=%u "
+                "geom={len=%u flags=0x%x syncs=%u} "
+                "pr={len=%u flags=0x%x syncs=%u} "
+                "frag={len=%u flags=0x%x syncs=%u}",
+                err,
+                strerror(err),
+                args.jobs.count,
+                drm_ctx->handle,
+                drm_rt_dataset->handle,
+                submit_info->rt_data_idx,
+                submit_info->has_fragment_job,
+                jobs_args[0].cmd_stream_len,
+                jobs_args[0].flags,
+                jobs_args[0].sync_ops.count,
+                jobs_args[1].cmd_stream_len,
+                jobs_args[1].flags,
+                jobs_args[1].sync_ops.count,
+                submit_info->has_fragment_job ? jobs_args[2].cmd_stream_len : 0,
+                submit_info->has_fragment_job ? jobs_args[2].flags : 0,
+                submit_info->has_fragment_job ? jobs_args[2].sync_ops.count : 0);
+
+      return vk_errorf(NULL,
+                       VK_ERROR_OUT_OF_DEVICE_MEMORY,
+                       "Failed to submit render job (errno %d: %s)",
+                       err,
+                       strerror(err));
+   }
+
+   return VK_SUCCESS;
 }

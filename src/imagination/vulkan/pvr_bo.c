@@ -526,7 +526,9 @@ void pvr_bo_suballocator_init(struct pvr_suballocator *allocator,
 void pvr_bo_suballocator_fini(struct pvr_suballocator *allocator)
 {
    pvr_bo_free(allocator->device, allocator->bo);
-   pvr_bo_free(allocator->device, allocator->bo_cached);
+
+   for (uint32_t i = 0; i < allocator->bo_cached_count; i++)
+      pvr_bo_free(allocator->device, allocator->bo_cached[i]);
 
    simple_mtx_destroy(&allocator->mtx);
 }
@@ -610,15 +612,15 @@ VkResult pvr_bo_suballoc(struct pvr_suballocator *allocator,
 
    alloc_size = MAX2(aligned_size, ALIGN_POT(allocator->default_size, align));
 
-   if (allocator->bo_cached) {
-      struct pvr_winsys_bo *bo_cached = allocator->bo_cached->bo;
+   for (uint32_t i = 0; i < allocator->bo_cached_count; i++) {
+      struct pvr_bo *bo_cached = allocator->bo_cached[i];
 
-      if (alloc_size <= bo_cached->size)
-         allocator->bo = allocator->bo_cached;
-      else
-         pvr_bo_free(allocator->device, allocator->bo_cached);
-
-      allocator->bo_cached = NULL;
+      if (alloc_size <= bo_cached->bo->size) {
+         allocator->bo = bo_cached;
+         allocator->bo_cached[i] =
+            allocator->bo_cached[--allocator->bo_cached_count];
+         break;
+      }
    }
 
    if (!allocator->bo) {
@@ -667,8 +669,11 @@ void pvr_bo_suballoc_free(struct pvr_suballoc_bo *suballoc_bo)
    simple_mtx_lock(&suballoc_bo->allocator->mtx);
 
    if (p_atomic_read(&suballoc_bo->bo->ref_count) == 1 &&
-       !suballoc_bo->allocator->bo_cached) {
-      suballoc_bo->allocator->bo_cached = suballoc_bo->bo;
+       suballoc_bo->allocator->bo_cached_count <
+          PVR_SUBALLOCATOR_CACHE_SIZE) {
+      suballoc_bo->allocator
+         ->bo_cached[suballoc_bo->allocator->bo_cached_count++] =
+         suballoc_bo->bo;
    } else {
       pvr_bo_free(suballoc_bo->allocator->device, suballoc_bo->bo);
    }

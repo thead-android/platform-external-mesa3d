@@ -60,19 +60,32 @@ pvr_srv_compute_cmd_stream_load(struct rogue_fwif_cmd_compute *const cmd,
    stream_ptr += pvr_cmd_length(CR_CDM_CONTEXT_PDS1);
 
    if (PVR_HAS_FEATURE(dev_info, compute_morton_capable)) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->cdm_item = *stream_ptr;
+#endif
       stream_ptr += pvr_cmd_length(CR_CDM_ITEM);
    }
 
    if (PVR_HAS_FEATURE(dev_info, cluster_grouping)) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->compute_cluster = *stream_ptr;
+#endif
       stream_ptr += pvr_cmd_length(CR_COMPUTE_CLUSTER);
    }
 
    if (PVR_HAS_FEATURE(dev_info, tpu_dm_global_registers)) {
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->tpu_tag_cdm_ctrl = *stream_ptr;
+#else
+      regs->tpu_tag_cdm_ctrl = *stream_ptr;
+#endif
       stream_ptr++;
    }
+
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+   assert(!PVR_HAS_FEATURE(dev_info, compute_morton_capable));
+   assert(!PVR_HAS_FEATURE(dev_info, cluster_grouping));
+#endif
 
    if (PVR_HAS_FEATURE(dev_info, gpu_multicore_support)) {
       cmd->execute_count = *stream_ptr;
@@ -103,7 +116,11 @@ static void pvr_srv_compute_cmd_ext_stream_load(
 
    assert(PVR_HAS_QUIRK(dev_info, 49927) == header0.has_brn49927);
    if (header0.has_brn49927) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->tpu = *ext_stream_ptr;
+#else
+      assert(header0.has_brn49927 == 0);
+#endif
       ext_stream_ptr += pvr_cmd_length(CR_TPU);
    }
 

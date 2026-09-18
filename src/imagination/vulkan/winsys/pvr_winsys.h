@@ -161,10 +161,10 @@ struct pvr_winsys_rt_dataset_create_info {
    uint32_t isp_merge_upper_y;
 
    /* Allocations and associated information */
-   pvr_dev_addr_t vheap_table_dev_addr;
-   pvr_dev_addr_t rtc_dev_addr;
+   pvr_dev_addr_t vheap_table_dev_addrs[ROGUE_NUM_GEOMDATAS];
+   pvr_dev_addr_t rtc_dev_addrs[ROGUE_NUM_GEOMDATAS];
 
-   pvr_dev_addr_t tpc_dev_addr;
+   pvr_dev_addr_t tpc_dev_addrs[ROGUE_NUM_GEOMDATAS];
    uint32_t tpc_stride;
    uint32_t tpc_size;
 
@@ -178,6 +178,12 @@ struct pvr_winsys_rt_dataset_create_info {
 
 struct pvr_winsys_rt_dataset {
    struct pvr_winsys *ws;
+
+   /* Number of render-target data entries accepted by this kernel ABI.
+    * Services firmware can expose more entries than the upstream DRM UAPI,
+    * even when both winsys backends are built into the same driver.
+    */
+   uint32_t rt_data_count;
 };
 
 enum pvr_winsys_ctx_priority {

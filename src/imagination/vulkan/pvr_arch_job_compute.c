@@ -131,7 +131,9 @@ pvr_submit_info_stream_init(struct pvr_compute_ctx *ctx,
    if (PVR_HAS_FEATURE(dev_info, gpu_multicore_support)) {
       if (device->pdevice->dev_runtime_info.core_count > 1)
          pvr_finishme("Emit execute_count, core_count is greater than one");
-      *stream_ptr = 0;
+      /* A zero execute count is not accepted by the Services 1.17 firmware,
+       * even on the single-core BXM-4-64 configuration. */
+      *stream_ptr = 1;
       stream_ptr++;
    }
 

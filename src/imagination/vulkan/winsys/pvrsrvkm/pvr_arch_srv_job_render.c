@@ -57,7 +57,8 @@
 struct pvr_srv_winsys_free_list {
    struct pvr_winsys_free_list base;
 
-   void *handle;
+   void *handles[ROGUE_FWIF_NUM_GEOMDATAS];
+   uint32_t handle_count;
 
    struct pvr_srv_winsys_free_list *parent;
 };
@@ -305,35 +306,43 @@ VkResult PVR_PER_ARCH(srv_render_target_dataset_create)(
    const struct pvr_device_info *dev_info,
    struct pvr_winsys_rt_dataset **const rt_dataset_out)
 {
-   const pvr_dev_addr_t macrotile_addrs[ROGUE_FWIF_NUM_RTDATAS] = {
-      [0] = create_info->rt_datas[0].macrotile_array_dev_addr,
-      [1] = create_info->rt_datas[1].macrotile_array_dev_addr,
-   };
-   const pvr_dev_addr_t pm_mlist_addrs[ROGUE_FWIF_NUM_RTDATAS] = {
-      [0] = create_info->rt_datas[0].pm_mlist_dev_addr,
-      [1] = create_info->rt_datas[1].pm_mlist_dev_addr,
-   };
-   const pvr_dev_addr_t rgn_header_addrs[ROGUE_FWIF_NUM_RTDATAS] = {
-      [0] = create_info->rt_datas[0].rgn_header_dev_addr,
-      [1] = create_info->rt_datas[1].rgn_header_dev_addr,
-   };
+   pvr_dev_addr_t macrotile_addrs[ROGUE_FWIF_NUM_RTDATAS];
+   pvr_dev_addr_t pm_mlist_addrs[ROGUE_FWIF_NUM_RTDATAS];
+   pvr_dev_addr_t rgn_header_addrs[ROGUE_FWIF_NUM_RTDATAS];
 
    struct pvr_srv_winsys *srv_ws = to_pvr_srv_winsys(ws);
    struct pvr_srv_winsys_free_list *srv_local_free_list =
       to_pvr_srv_winsys_free_list(create_info->local_free_list);
-   void *free_lists[ROGUE_FW_MAX_FREELISTS] = { NULL };
+   void *free_lists[ROGUE_FWIF_NUM_RTDATA_FREELISTS] = { NULL };
    struct pvr_srv_winsys_rt_dataset *srv_rt_dataset;
-   void *handles[ROGUE_FWIF_NUM_RTDATAS];
+   void *handles[ROGUE_FWIF_NUM_RTDATAS] = { NULL };
    struct pvr_rogue_cr_te rogue_te_regs;
    struct pvr_rt_mtile_info mtile_info;
    uint32_t isp_mtile_size;
    VkResult result;
 
-   free_lists[ROGUE_FW_LOCAL_FREELIST] = srv_local_free_list->handle;
+   STATIC_ASSERT(ARRAY_SIZE(create_info->rt_datas) ==
+                 ROGUE_FWIF_NUM_RTDATAS);
+   for (uint32_t i = 0; i < ROGUE_FWIF_NUM_RTDATAS; i++) {
+      macrotile_addrs[i] = create_info->rt_datas[i].macrotile_array_dev_addr;
+      pm_mlist_addrs[i] = create_info->rt_datas[i].pm_mlist_dev_addr;
+      rgn_header_addrs[i] = create_info->rt_datas[i].rgn_header_dev_addr;
+   }
 
-   if (srv_local_free_list->parent) {
-      free_lists[ROGUE_FW_GLOBAL_FREELIST] =
-         srv_local_free_list->parent->handle;
+   assert(srv_local_free_list->parent);
+   assert(srv_local_free_list->handle_count == ROGUE_FWIF_NUM_GEOMDATAS);
+   assert(srv_local_free_list->parent->handle_count ==
+          ROGUE_FW_MAX_FREELISTS - 1U);
+
+   for (uint32_t i = 0; i < ROGUE_FWIF_NUM_GEOMDATAS; i++) {
+      const uint32_t base = i * ROGUE_FW_MAX_FREELISTS;
+
+      free_lists[base + ROGUE_FW_LOCAL_FREELIST] =
+         srv_local_free_list->handles[i];
+      free_lists[base + ROGUE_FW_GLOBAL_FREELIST] =
+         srv_local_free_list->parent->handles[0];
+      free_lists[base + ROGUE_FW_GLOBAL2_FREELIST] =
+         srv_local_free_list->parent->handles[1];
    }
 
    srv_rt_dataset = vk_zalloc(ws->alloc,
@@ -343,12 +352,8 @@ VkResult PVR_PER_ARCH(srv_render_target_dataset_create)(
    if (!srv_rt_dataset)
       return vk_error(NULL, VK_ERROR_OUT_OF_HOST_MEMORY);
 
-   /* If greater than 1 we'll have to pass in an array. For now just passing in
-    * the reference.
-    */
-   STATIC_ASSERT(ROGUE_FWIF_NUM_GEOMDATAS == 1);
-   /* If not 2 the arrays used in the bridge call will require updating. */
-   STATIC_ASSERT(ROGUE_FWIF_NUM_RTDATAS == 2);
+   STATIC_ASSERT(ROGUE_FWIF_NUM_GEOMDATAS ==
+                 ARRAY_SIZE(create_info->vheap_table_dev_addrs));
 
    pvr_arch_rt_mtile_info_init(dev_info,
                                &mtile_info,
@@ -371,10 +376,10 @@ VkResult PVR_PER_ARCH(srv_render_target_dataset_create)(
       pvr_rogue_get_cr_multisamplectl_val(create_info->samples, false),
       macrotile_addrs,
       pm_mlist_addrs,
-      &create_info->rtc_dev_addr,
+      create_info->rtc_dev_addrs,
       rgn_header_addrs,
-      &create_info->tpc_dev_addr,
-      &create_info->vheap_table_dev_addr,
+      create_info->tpc_dev_addrs,
+      create_info->vheap_table_dev_addrs,
       free_lists,
       create_info->isp_merge_lower_x,
       create_info->isp_merge_lower_y,
@@ -397,8 +402,8 @@ VkResult PVR_PER_ARCH(srv_render_target_dataset_create)(
    if (result != VK_SUCCESS)
       goto err_vk_free_srv_rt_dataset;
 
-   srv_rt_dataset->rt_datas[0].handle = handles[0];
-   srv_rt_dataset->rt_datas[1].handle = handles[1];
+   for (uint32_t i = 0; i < ARRAY_SIZE(srv_rt_dataset->rt_datas); i++)
+      srv_rt_dataset->rt_datas[i].handle = handles[i];
 
    for (uint32_t i = 0; i < ARRAY_SIZE(srv_rt_dataset->rt_datas); i++) {
       srv_rt_dataset->rt_datas[i].sync_prim = pvr_srv_sync_prim_alloc(srv_ws);
@@ -407,6 +412,8 @@ VkResult PVR_PER_ARCH(srv_render_target_dataset_create)(
    }
 
    srv_rt_dataset->base.ws = ws;
+   srv_rt_dataset->base.rt_data_count =
+      ARRAY_SIZE(srv_rt_dataset->rt_datas);
 
    *rt_dataset_out = &srv_rt_dataset->base;
 
@@ -521,7 +528,9 @@ static void pvr_srv_geometry_cmd_ext_stream_load(
 
    assert(PVR_HAS_QUIRK(dev_info, 49927) == header0.has_brn49927);
    if (header0.has_brn49927) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->tpu = *ext_stream_ptr;
+#endif
       ext_stream_ptr += pvr_cmd_length(CR_TPU);
    }
 
@@ -600,14 +609,27 @@ pvr_srv_fragment_cmd_stream_load(struct rogue_fwif_cmd_3d *const cmd,
    stream_ptr += pvr_cmd_length(CR_ISP_STENCIL_LOAD_BASE);
 
    if (PVR_HAS_FEATURE(dev_info, requires_fb_cdc_zls_setup)) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->fb_cdc_zls = *(const uint64_t *)stream_ptr;
+#endif
       stream_ptr += 2U;
    }
 
    STATIC_ASSERT(ARRAY_SIZE(regs->pbe_word) == 8U);
-   STATIC_ASSERT(ARRAY_SIZE(regs->pbe_word[0]) == 3U);
+   STATIC_ASSERT(ARRAY_SIZE(regs->pbe_word[0]) ==
+                 ROGUE_PBE_WORDS_REQUIRED_FOR_RENDERS);
    STATIC_ASSERT(sizeof(regs->pbe_word[0][0]) == sizeof(uint64_t));
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+   /* The KMD stream is Mesa-internal and still carries three words per PBE,
+    * while the 1.17 Services firmware command accepts the first two. */
+   for (uint32_t i = 0; i < ARRAY_SIZE(regs->pbe_word); i++) {
+      memcpy(regs->pbe_word[i],
+             stream_ptr + i * 3U * 2U,
+             sizeof(regs->pbe_word[i]));
+   }
+#else
    memcpy(regs->pbe_word, stream_ptr, sizeof(regs->pbe_word));
+#endif
    stream_ptr += 8U * 3U * 2U;
 
    regs->tpu_border_colour_table = *(const uint64_t *)stream_ptr;
@@ -623,11 +645,13 @@ pvr_srv_fragment_cmd_stream_load(struct rogue_fwif_cmd_3d *const cmd,
    memcpy(regs->pds_pr_bgnd, stream_ptr, sizeof(regs->pds_pr_bgnd));
    stream_ptr += 3U * 2U;
 
-   STATIC_ASSERT(ARRAY_SIZE(regs->usc_clear_register) == 8U);
+   STATIC_ASSERT(ARRAY_SIZE(regs->usc_clear_register) ==
+                 ROGUE_MAXIMUM_OUTPUT_REGISTERS_PER_PIXEL);
    STATIC_ASSERT(sizeof(regs->usc_clear_register[0]) == sizeof(uint32_t));
    memcpy(regs->usc_clear_register,
           stream_ptr,
           sizeof(regs->usc_clear_register));
+   /* The Mesa KMD stream has room for all eight clear registers. */
    stream_ptr += 8U;
 
    regs->usc_pixel_output_ctrl = *stream_ptr;
@@ -649,7 +673,9 @@ pvr_srv_fragment_cmd_stream_load(struct rogue_fwif_cmd_3d *const cmd,
    stream_ptr += pvr_cmd_length(CR_EVENT_PIXEL_PDS_INFO);
 
    if (PVR_HAS_FEATURE(dev_info, cluster_grouping)) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->pixel_phantom = *stream_ptr;
+#endif
       stream_ptr++;
    }
 
@@ -665,7 +691,9 @@ pvr_srv_fragment_cmd_stream_load(struct rogue_fwif_cmd_3d *const cmd,
    }
 
    if (PVR_HAS_FEATURE(dev_info, zls_subtile)) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->isp_zls_pixels = *stream_ptr;
+#endif
       stream_ptr += pvr_cmd_length(CR_ISP_ZLS_PIXELS);
    }
 
@@ -704,7 +732,9 @@ static void pvr_srv_fragment_cmd_ext_stream_load(
 
    assert(PVR_HAS_QUIRK(dev_info, 49927) == header0.has_brn49927);
    if (header0.has_brn49927) {
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
       regs->tpu = *ext_stream_ptr;
+#endif
       ext_stream_ptr += pvr_cmd_length(CR_TPU);
    }
 

@@ -19,6 +19,7 @@
 #include "util/disk_cache.h"
 #include "util/ralloc.h"
 
+#include "vk_android.h"
 #include "vk_util.h"
 #include "vk_log.h"
 
@@ -136,8 +137,12 @@ static void pvr_physical_device_get_supported_extensions(
       .KHR_external_fence_fd = true,
       .KHR_external_memory = true,
       .KHR_external_memory_fd = true,
-      .KHR_external_semaphore = PVR_USE_WSI_PLATFORM,
-      .KHR_external_semaphore_fd = PVR_USE_WSI_PLATFORM,
+      /* Android's loader owns swapchain WSI, but RenderEngine and other
+       * clients still need public sync-fd semaphore interop.  The DRM
+       * syncobj winsys supports this independently of a Mesa WSI platform.
+       */
+      .KHR_external_semaphore = true,
+      .KHR_external_semaphore_fd = true,
       .KHR_format_feature_flags2 = false,
       .KHR_get_memory_requirements2 = true,
       .KHR_incremental_present = PVR_USE_WSI_PLATFORM,
@@ -202,6 +207,16 @@ static void pvr_physical_device_get_supported_extensions(
       .EXT_tooling_info = true,
       .EXT_vertex_attribute_divisor = true,
       .EXT_zero_initialize_device_memory = true,
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      /* Android's Vulkan loader implements VK_KHR_swapchain and maps it to
+       * the HAL-only VK_ANDROID_native_buffer extension.  Advertising the
+       * generic WSI swapchain extension here makes the loader strip it before
+       * device creation and leaves both sides with mismatched dispatch state.
+       */
+      .ANDROID_external_memory_android_hardware_buffer =
+         vk_android_get_ugralloc() != NULL,
+      .ANDROID_native_buffer = vk_android_get_ugralloc() != NULL,
+#endif
    };
 }
 
@@ -1047,6 +1062,7 @@ VkResult pvr_physical_device_init(struct pvr_physical_device *pdevice,
       goto err_pvr_winsys_destroy;
 
    if (!pvr_device_is_conformant(&pdevice->dev_info)) {
+#ifndef VK_USE_PLATFORM_ANDROID_KHR
       if (!os_get_option("PVR_I_WANT_A_BROKEN_VULKAN_DRIVER")) {
          result = vk_errorf(instance,
                             VK_ERROR_INCOMPATIBLE_DRIVER,
@@ -1057,6 +1073,7 @@ VkResult pvr_physical_device_init(struct pvr_physical_device *pdevice,
                             pdevice->dev_info.ident.public_name);
          goto err_pvr_winsys_destroy;
       }
+#endif
 
       vk_warn_non_conformant_implementation("powervr");
    }

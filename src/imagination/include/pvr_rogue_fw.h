@@ -33,7 +33,15 @@
  * information to be queried, but the pvrsrvkm KM driver doesn't. This
  * information should really be queried from the winsys.
  */
-/* Indicates the number of Render Target Datas in a Render Target Dataset. */
+/* The TH1520 Services firmware is built with SUPPORT_AGP. */
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+#define ROGUE_NUM_RTDATAS 4U
+#define ROGUE_NUM_GEOMDATAS 4U
+#define ROGUE_NUM_GLOBAL_FREELISTS 2U
+#else
 #define ROGUE_NUM_RTDATAS 2U
+#define ROGUE_NUM_GEOMDATAS 1U
+#define ROGUE_NUM_GLOBAL_FREELISTS 1U
+#endif
 
 #endif /* PVR_ROGUE_FW_H */

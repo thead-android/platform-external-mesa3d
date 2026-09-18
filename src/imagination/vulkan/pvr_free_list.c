@@ -40,6 +40,7 @@ VkResult pvr_free_list_create(struct pvr_device *device,
    uint32_t max_num_pages;
    uint64_t addr_alignment;
    uint64_t size_alignment;
+   uint64_t allocation_size;
    uint64_t size;
    VkResult result;
 
@@ -107,6 +108,14 @@ VkResult pvr_free_list_create(struct pvr_device *device,
    size = max_num_pages * ROGUE_FREE_LIST_ENTRY_SIZE;
    assert(align64(size, addr_alignment) == size);
 
+   /* Services firmware built with SUPPORT_AGP keeps one local freelist per
+    * geometry core and two global freelists. They can share one PMR, but each
+    * kernel freelist needs a disjoint slice of it.
+    */
+   allocation_size =
+      size * (parent_free_list ? ROGUE_NUM_GEOMDATAS
+                               : ROGUE_NUM_GLOBAL_FREELISTS);
+
    free_list = vk_alloc(&device->vk.alloc,
                         sizeof(*free_list),
                         8,
@@ -119,7 +128,7 @@ VkResult pvr_free_list_create(struct pvr_device *device,
     */
    result = pvr_bo_alloc(device,
                          device->heaps.general_heap,
-                         size,
+                         allocation_size,
                          addr_alignment,
                          bo_flags,
                          &free_list->bo);

@@ -203,6 +203,7 @@ static VkResult pvr_rt_vheap_rtc_data_init(struct pvr_device *device,
                                            uint32_t layers)
 {
    uint64_t vheap_size;
+   uint64_t geom_stride;
    uint32_t alignment;
    uint64_t rtc_size;
    VkResult result;
@@ -225,23 +226,27 @@ static VkResult pvr_rt_vheap_rtc_data_init(struct pvr_device *device,
 
    alignment = MAX2(ROGUE_CR_PM_VHEAP_TABLE_BASE_ADDR_ALIGNMENT,
                     ROGUE_CR_TA_RTC_ADDR_BASE_ALIGNMENT);
+   geom_stride = ALIGN_POT(vheap_size + rtc_size, alignment);
 
    result = pvr_bo_alloc(device,
                          device->heaps.general_heap,
-                         vheap_size + rtc_size,
+                         geom_stride * ROGUE_NUM_GEOMDATAS,
                          alignment,
                          PVR_BO_ALLOC_FLAG_GPU_UNCACHED,
                          &rt_dataset->vheap_rtc_bo);
    if (result != VK_SUCCESS)
       return result;
 
-   rt_dataset->vheap_dev_addr = rt_dataset->vheap_rtc_bo->vma->dev_addr;
+   for (uint32_t i = 0; i < ROGUE_NUM_GEOMDATAS; i++) {
+      rt_dataset->vheap_dev_addrs[i] = PVR_DEV_ADDR_OFFSET(
+         rt_dataset->vheap_rtc_bo->vma->dev_addr, geom_stride * i);
 
-   if (rtc_size > 0) {
-      rt_dataset->rtc_dev_addr =
-         PVR_DEV_ADDR_OFFSET(rt_dataset->vheap_dev_addr, vheap_size);
-   } else {
-      rt_dataset->rtc_dev_addr = PVR_DEV_ADDR_INVALID;
+      if (rtc_size > 0) {
+         rt_dataset->rtc_dev_addrs[i] = PVR_DEV_ADDR_OFFSET(
+            rt_dataset->vheap_dev_addrs[i], vheap_size);
+      } else {
+         rt_dataset->rtc_dev_addrs[i] = PVR_DEV_ADDR_INVALID;
+      }
    }
 
    return VK_SUCCESS;
@@ -297,7 +302,9 @@ static VkResult pvr_rt_tpc_data_init(struct pvr_device *device,
                                      const struct pvr_rt_mtile_info *mtile_info,
                                      uint32_t layers)
 {
+   pvr_dev_addr_t dev_addr;
    uint64_t tpc_size;
+   VkResult result;
 
    pvr_rt_get_tail_ptr_stride_size(device,
                                    mtile_info,
@@ -306,12 +313,22 @@ static VkResult pvr_rt_tpc_data_init(struct pvr_device *device,
                                    &rt_dataset->tpc_size);
    tpc_size = ALIGN_POT(rt_dataset->tpc_size, ROGUE_TE_TPC_CACHE_LINE_SIZE);
 
-   return pvr_bo_alloc(device,
-                       device->heaps.general_heap,
-                       tpc_size,
-                       ROGUE_CR_TE_TPC_ADDR_BASE_ALIGNMENT,
-                       PVR_BO_ALLOC_FLAG_GPU_UNCACHED,
-                       &rt_dataset->tpc_bo);
+   result = pvr_bo_alloc(device,
+                         device->heaps.general_heap,
+                         tpc_size * ROGUE_NUM_GEOMDATAS,
+                         ROGUE_CR_TE_TPC_ADDR_BASE_ALIGNMENT,
+                         PVR_BO_ALLOC_FLAG_GPU_UNCACHED,
+                         &rt_dataset->tpc_bo);
+   if (result != VK_SUCCESS)
+      return result;
+
+   dev_addr = rt_dataset->tpc_bo->vma->dev_addr;
+   for (uint32_t i = 0; i < ROGUE_NUM_GEOMDATAS; i++) {
+      rt_dataset->tpc_dev_addrs[i] = dev_addr;
+      dev_addr = PVR_DEV_ADDR_OFFSET(dev_addr, tpc_size);
+   }
+
+   return VK_SUCCESS;
 }
 
 static uint32_t
@@ -589,10 +606,16 @@ static void pvr_rt_dataset_ws_create_info_init(
    }
 
    /* Allocations and associated information. */
-   create_info->vheap_table_dev_addr = rt_dataset->vheap_dev_addr;
-   create_info->rtc_dev_addr = rt_dataset->rtc_dev_addr;
+   STATIC_ASSERT(ARRAY_SIZE(create_info->vheap_table_dev_addrs) ==
+                 ARRAY_SIZE(rt_dataset->vheap_dev_addrs));
+   for (uint32_t i = 0; i < ARRAY_SIZE(create_info->vheap_table_dev_addrs);
+        i++) {
+      create_info->vheap_table_dev_addrs[i] =
+         rt_dataset->vheap_dev_addrs[i];
+      create_info->rtc_dev_addrs[i] = rt_dataset->rtc_dev_addrs[i];
+      create_info->tpc_dev_addrs[i] = rt_dataset->tpc_dev_addrs[i];
+   }
 
-   create_info->tpc_dev_addr = rt_dataset->tpc_bo->vma->dev_addr;
    create_info->tpc_stride = rt_dataset->tpc_stride;
    create_info->tpc_size = rt_dataset->tpc_size;
 
@@ -1271,7 +1294,13 @@ static void pvr_frag_state_stream_init(struct pvr_render_ctx *ctx,
    if (PVR_HAS_FEATURE(dev_info, gpu_multicore_support)) {
       if (device->pdevice->dev_runtime_info.core_count > 1)
          pvr_finishme("Emit execute_count core_count is greater than one");
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+      /* The AGP firmware treats zero as an invalid per-core tile quantum.
+       * The vendor UMD uses one on BXM-4-64. */
+      *stream_ptr = 1;
+#else
       *stream_ptr = 0;
+#endif
       stream_ptr++;
    }
 
@@ -1500,8 +1529,12 @@ VkResult pvr_arch_render_job_submit(struct pvr_render_ctx *ctx,
        * successfully submitted. This will allow the next geometry job to be
        * submitted to been run in parallel with it.
        */
+      assert(rt_dataset->ws_rt_dataset->rt_data_count > 0);
+      assert(rt_dataset->ws_rt_dataset->rt_data_count <=
+             ARRAY_SIZE(rt_dataset->rt_datas));
       rt_dataset->rt_data_idx =
-         (rt_dataset->rt_data_idx + 1) % ARRAY_SIZE(rt_dataset->rt_datas);
+         (rt_dataset->rt_data_idx + 1) %
+         rt_dataset->ws_rt_dataset->rt_data_count;
 
       rt_dataset->need_frag = false;
    } else {

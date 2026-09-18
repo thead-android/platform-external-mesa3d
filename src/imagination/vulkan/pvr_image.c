@@ -28,6 +28,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+#include <vndk/hardware_buffer.h>
+#endif
+
 #include "drm-uapi/drm_fourcc.h"
 #include "pvr_buffer.h"
 #include "pvr_device.h"
@@ -40,6 +44,7 @@
 #include "util/macros.h"
 #include "util/u_math.h"
 #include "vk_format.h"
+#include "vk_android.h"
 #include "vk_image.h"
 #include "vk_log.h"
 #include "vk_object.h"
@@ -263,6 +268,19 @@ static VkResult pvr_pick_modifier(const VkImageCreateInfo *pCreateInfo,
    return VK_SUCCESS;
 }
 
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+static bool pvr_image_uses_ahb(const VkImageCreateInfo *pCreateInfo)
+{
+   const VkExternalMemoryImageCreateInfo *external_info =
+      vk_find_struct_const(pCreateInfo->pNext,
+                           EXTERNAL_MEMORY_IMAGE_CREATE_INFO);
+
+   return external_info &&
+          (external_info->handleTypes &
+           VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID);
+}
+#endif
+
 VkResult pvr_CreateImage(VkDevice _device,
                          const VkImageCreateInfo *pCreateInfo,
                          const VkAllocationCallbacks *pAllocator,
@@ -270,6 +288,15 @@ VkResult pvr_CreateImage(VkDevice _device,
 {
    VK_FROM_HANDLE(pvr_device, device, _device);
    struct pvr_image *image;
+   const VkImageCreateInfo *create_info = pCreateInfo;
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   const VkNativeBufferANDROID *native_buffer =
+      vk_find_struct_const(pCreateInfo->pNext, NATIVE_BUFFER_ANDROID);
+   VkImageCreateInfo android_create_info;
+   VkImageDrmFormatModifierExplicitCreateInfoEXT modifier_info;
+   VkSubresourceLayout plane_layouts[4];
+   VkResult result;
+#endif
 
    if (wsi_common_is_swapchain_image(pCreateInfo)) {
       return wsi_common_create_swapchain_image(&device->pdevice->wsi_device,
@@ -277,12 +304,49 @@ VkResult pvr_CreateImage(VkDevice _device,
                                                pImage);
    }
 
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   if (native_buffer) {
+      result = vk_android_get_anb_layout(pCreateInfo,
+                                         &modifier_info,
+                                         plane_layouts,
+                                         ARRAY_SIZE(plane_layouts));
+      if (result != VK_SUCCESS)
+         return vk_error(device, result);
+
+      modifier_info.pNext = pCreateInfo->pNext;
+      android_create_info = *pCreateInfo;
+      android_create_info.pNext = &modifier_info;
+      android_create_info.tiling = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
+      create_info = &android_create_info;
+   } else if (pvr_image_uses_ahb(pCreateInfo)) {
+      /* minigbm exposes its Android hardware buffers as linear dma-bufs.  The
+       * exact stride is applied when the AHB memory is bound below. */
+      android_create_info = *pCreateInfo;
+      android_create_info.tiling = VK_IMAGE_TILING_LINEAR;
+      create_info = &android_create_info;
+   }
+#endif
+
    image =
-      vk_image_create(&device->vk, pCreateInfo, pAllocator, sizeof(*image));
+      vk_image_create(&device->vk, create_info, pAllocator, sizeof(*image));
    if (!image)
       return vk_error(device, VK_ERROR_OUT_OF_HOST_MEMORY);
 
-   pvr_image_init(device, pCreateInfo, image);
+   pvr_image_init(device, create_info, image);
+
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   if (native_buffer) {
+      result = vk_android_import_anb(&device->vk,
+                                     create_info,
+                                     pAllocator,
+                                     &image->vk);
+      if (result != VK_SUCCESS) {
+         pvr_image_fini(device, image);
+         vk_image_destroy(&device->vk, pAllocator, &image->vk);
+         return vk_error(device, result);
+      }
+   }
+#endif
 
    *pImage = pvr_image_to_handle(image);
 
@@ -378,6 +442,47 @@ VkResult pvr_BindImageMemory2(VkDevice _device,
       VkDeviceSize offset = pBindInfos[i].memoryOffset;
       VkResult result;
 
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      const VkNativeBufferANDROID *native_buffer =
+         vk_find_struct_const(pBindInfos[i].pNext, NATIVE_BUFFER_ANDROID);
+
+      /* Android allocates deferred swapchain images before a gralloc buffer is
+       * dequeued.  The first memory-less bind carries that buffer as an ANB;
+       * import and bind it here instead of treating Android's swapchain handle
+       * as one of Mesa's desktop WSI objects. */
+      if (!mem && native_buffer) {
+         if (image->vk.anb_memory) {
+            assert(image->vma);
+            continue;
+         }
+
+         if (image->plane_count != 1 || image->vk.mip_levels != 1 ||
+             image->vk.array_layers != 1) {
+            return vk_error(device, VK_ERROR_FORMAT_NOT_SUPPORTED);
+         }
+
+         image->vk.tiling = VK_IMAGE_TILING_LINEAR;
+         image->memlayout = PVR_MEMLAYOUT_LINEAR;
+         image->planes[0].physical_extent.width = native_buffer->stride;
+         image->planes[0].physical_extent.height = image->vk.extent.height;
+         image->planes[0].physical_extent.depth = 1;
+         pvr_image_setup_mip_levels(image);
+
+         const VkImageCreateInfo import_info = {
+            .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+            .pNext = native_buffer,
+         };
+         result = vk_android_import_anb(&device->vk,
+                                        &import_info,
+                                        &device->vk.alloc,
+                                        &image->vk);
+         if (result != VK_SUCCESS)
+            return vk_error(device, result);
+
+         continue;
+      }
+#endif
+
 #if defined(PVR_USE_WSI_PLATFORM)
       const VkBindImageMemorySwapchainInfoKHR *swapchain_info =
          vk_find_struct_const(pBindInfos[i].pNext,
@@ -391,6 +496,25 @@ VkResult pvr_BindImageMemory2(VkDevice _device,
 
          mem = swapchain_memory;
          offset = 0;
+      }
+#endif
+
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      if (mem->vk.ahardware_buffer) {
+         AHardwareBuffer_Desc desc;
+
+         AHardwareBuffer_describe(mem->vk.ahardware_buffer, &desc);
+         if (image->plane_count != 1 || image->vk.mip_levels != 1 ||
+             image->vk.array_layers != 1) {
+            return vk_error(device, VK_ERROR_FORMAT_NOT_SUPPORTED);
+         }
+
+         image->vk.tiling = VK_IMAGE_TILING_LINEAR;
+         image->memlayout = PVR_MEMLAYOUT_LINEAR;
+         image->planes[0].physical_extent.width = desc.stride;
+         image->planes[0].physical_extent.height = desc.height;
+         image->planes[0].physical_extent.depth = 1;
+         pvr_image_setup_mip_levels(image);
       }
 #endif
 

@@ -174,7 +174,7 @@ CHECK_MASK_SIZE(pvr_load_op,
 VkResult PVR_PER_ARCH(init_usc_mrt_setup)(
    struct pvr_device *device,
    uint32_t attachment_count,
-   const VkFormat attachment_formats[attachment_count],
+   const VkFormat *attachment_formats,
    struct usc_mrt_setup *setup);
 
 #   define pvr_arch_init_usc_mrt_setup PVR_PER_ARCH(init_usc_mrt_setup)

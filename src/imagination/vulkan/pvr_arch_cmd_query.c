@@ -137,7 +137,7 @@ void PVR_PER_ARCH(CmdCopyQueryPoolResults)(VkCommandBuffer commandBuffer,
    };
 }
 
-static inline const uint32_t
+static inline uint32_t
 pvr_cmd_buffer_state_get_view_count(const struct pvr_cmd_buffer_state *state)
 {
    const struct pvr_render_pass_info *render_pass_info =

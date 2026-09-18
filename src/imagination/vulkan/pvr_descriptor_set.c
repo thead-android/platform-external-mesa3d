@@ -53,7 +53,7 @@
 #include "vk_log.h"
 #include "vk_object.h"
 #include "vk_util.h"
-#include "vulkan/util/vk_enum_to_str.h"
+#include "vk_enum_to_str.h"
 
 static bool
 binding_has_immutable_samplers(const VkDescriptorSetLayoutBinding *binding)

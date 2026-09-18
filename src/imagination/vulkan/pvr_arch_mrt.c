@@ -190,7 +190,7 @@ static VkResult pvr_alloc_mrt(const struct pvr_device_info *dev_info,
 VkResult
 pvr_arch_init_usc_mrt_setup(struct pvr_device *device,
                             uint32_t attachment_count,
-                            const VkFormat attachment_formats[attachment_count],
+                            const VkFormat *attachment_formats,
                             struct usc_mrt_setup *setup)
 {
    const struct pvr_device_info *dev_info = &device->pdevice->dev_info;

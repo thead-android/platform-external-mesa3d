@@ -24,7 +24,10 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <vulkan/vulkan.h>
 
 #include "pvr_blit.h"
@@ -55,6 +58,13 @@
 /* TODO: Investigate where this limit comes from. */
 #define PVR_MAX_TRANSFER_SIZE_IN_TEXELS 2048U
 #define PVR_RESOLVE_DEFAULT PVR_RESOLVE_BLEND
+
+static bool pvr_trace_render_enabled(void)
+{
+   const char *value = getenv("PVR_TRACE_RENDER");
+
+   return value && value[0] && strcmp(value, "0");
+}
 
 static inline void
 pvr_transfer_cmd_init_default(struct pvr_cmd_buffer *cmd_buffer,
@@ -2371,6 +2381,31 @@ void pvr_rogue_CmdClearAttachments(VkCommandBuffer commandBuffer,
    VK_FROM_HANDLE(pvr_cmd_buffer, cmd_buffer, commandBuffer);
    struct pvr_cmd_buffer_state *state = &cmd_buffer->state;
    struct pvr_sub_cmd_gfx *sub_cmd = &state->current_sub_cmd->gfx;
+
+   if (pvr_trace_render_enabled()) {
+      fprintf(stderr,
+              "PVRTRACE CmdClearAttachments attachments=%u rects=%u"
+              " aspect=0x%x color=%u value=%g,%g,%g,%g"
+              " rect=%d,%d %ux%u base_layer=%u layers=%u\n",
+              attachmentCount,
+              rectCount,
+              attachmentCount ? pAttachments[0].aspectMask : 0,
+              attachmentCount ? pAttachments[0].colorAttachment : 0,
+              attachmentCount ? pAttachments[0].clearValue.color.float32[0]
+                              : 0.0,
+              attachmentCount ? pAttachments[0].clearValue.color.float32[1]
+                              : 0.0,
+              attachmentCount ? pAttachments[0].clearValue.color.float32[2]
+                              : 0.0,
+              attachmentCount ? pAttachments[0].clearValue.color.float32[3]
+                              : 0.0,
+              rectCount ? pRects[0].rect.offset.x : 0,
+              rectCount ? pRects[0].rect.offset.y : 0,
+              rectCount ? pRects[0].rect.extent.width : 0,
+              rectCount ? pRects[0].rect.extent.height : 0,
+              rectCount ? pRects[0].baseArrayLayer : 0,
+              rectCount ? pRects[0].layerCount : 0);
+   }
 
    PVR_CHECK_COMMAND_BUFFER_BUILDING_STATE(cmd_buffer);
    assert(state->current_sub_cmd->type == PVR_SUB_CMD_TYPE_GRAPHICS);

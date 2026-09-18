@@ -155,29 +155,37 @@ struct rogue_fwif_ta_regs {
    uint64_t vdm_ctrl_stream_base;
    uint64_t tpu_border_colour_table;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature VDM_DRAWINDIRECT present. */
    uint64_t vdm_draw_indirect0;
    /* Only used when feature VDM_DRAWINDIRECT present. */
    uint32_t vdm_draw_indirect1;
+#endif
 
    uint32_t ppp_ctrl;
    uint32_t te_psg;
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when BRN 49927 present. */
    uint32_t tpu;
+#endif
 
    uint32_t vdm_context_resume_task0_size;
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature VDM_OBJECT_LEVEL_LLS present. */
    uint32_t vdm_context_resume_task3_size;
 
    /* Only used when BRN 67381 present. */
    uint32_t pds_ctrl;
+#endif
 
    uint32_t view_idx;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature TESSELLATION present */
    uint32_t pds_coeff_free_prog;
 
    uint32_t padding;
+#endif
 };
 
 /**
@@ -217,12 +225,14 @@ struct rogue_fwif_cmd_ta {
     */
    struct rogue_fwif_ufo partial_render_ta_3d_fence;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when BRN 44455 or BRN 63027 present. */
    alignas(8) struct rogue_fwif_dummy_rgnhdr_init_geom_regs
       dummy_rgnhdr_init_geom_regs;
 
    /* Only used when BRN 61484 or BRN 66333 present. */
    uint32_t brn61484_66333_live_rt;
+#endif
 
    uint32_t padding;
 };
@@ -234,6 +244,10 @@ static_assert(
 static_assert(
    sizeof(struct rogue_fwif_cmd_ta) <= ROGUE_FWIF_DM_INDEPENDENT_KICK_CMD_SIZE,
    "kernel expects command size be increased to match current TA command size");
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+static_assert(sizeof(struct rogue_fwif_cmd_ta) == 64U,
+              "TH1520 1.17 Services firmware requires a 64-byte TA command");
+#endif
 
 /**
  * \brief Configuration registers which need to be loaded by the firmware before
@@ -247,39 +261,54 @@ struct rogue_fwif_3d_regs {
     */
    uint32_t usc_pixel_output_ctrl;
 
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+/* The TH1520 BXM-4-64 1.17 firmware ABI has four clear registers. */
+#define ROGUE_MAXIMUM_OUTPUT_REGISTERS_PER_PIXEL 4U
+#else
 #define ROGUE_MAXIMUM_OUTPUT_REGISTERS_PER_PIXEL 8U
+#endif
    uint32_t usc_clear_register[ROGUE_MAXIMUM_OUTPUT_REGISTERS_PER_PIXEL];
 
    uint32_t isp_bgobjdepth;
    uint32_t isp_bgobjvals;
    uint32_t isp_aa;
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature S7_TOP_INFRASTRUCTURE present. */
    uint32_t isp_xtp_pipe_enable;
+#endif
 
    uint32_t isp_ctl;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature CLUSTER_GROUPING present. */
    uint32_t tpu;
+#endif
 
    uint32_t event_pixel_pds_info;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    uint32_t pixel_phantom;
+#endif
 
    uint32_t view_idx;
 
    uint32_t event_pixel_pds_data;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when BRN 65101 present. */
    uint32_t brn65101_event_pixel_pds_data;
+#endif
 
    /* Only used when feature GPU_MULTICORE_SUPPORT or BRN 47217 present. */
    uint32_t isp_oclqry_stride;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature ZLS_SUBTILE present. */
    uint32_t isp_zls_pixels;
 
    /* Only used when feature ISP_ZLS_D24_S8_PACKING_OGL_MODE present. */
    uint32_t rgx_cr_blackpearl_fix;
+#endif
 
    /* All values below the alignas(8) must be 64 bit. */
    alignas(8) uint64_t isp_scissor_base;
@@ -294,18 +323,28 @@ struct rogue_fwif_3d_regs {
     * FB_CDC_V4 present. Additionally, BRNs 48754, 60227, 72310 and 72311 must
     * not be present.
     */
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    uint64_t fb_cdc_zls;
+#endif
 
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+/* The TH1520 BXM-4-64 1.17 firmware ABI has two PBE state words. */
+#define ROGUE_PBE_WORDS_REQUIRED_FOR_RENDERS 2U
+#else
 #define ROGUE_PBE_WORDS_REQUIRED_FOR_RENDERS 3U
+#endif
    uint64_t pbe_word[8U][ROGUE_PBE_WORDS_REQUIRED_FOR_RENDERS];
    uint64_t tpu_border_colour_table;
    uint64_t pds_bgnd[3U];
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when BRN 65101 present. */
    uint64_t pds_bgnd_brn65101[3U];
+#endif
 
    uint64_t pds_pr_bgnd[3U];
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when BRN 62850 or 62865 present. */
    uint64_t isp_dummy_stencil_store_base;
 
@@ -316,6 +355,7 @@ struct rogue_fwif_3d_regs {
    uint32_t rgnhdr_single_rt_size;
    /* Only used when BRN 67182 present. */
    uint32_t rgnhdr_scratch_offset;
+#endif
 };
 
 /**
@@ -344,7 +384,9 @@ struct rogue_fwif_cmd_3d {
    /* Number of tiles to submit to GPU<N> before moving to GPU<N+1>. */
    uint32_t execute_count;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    uint32_t padding;
+#endif
 };
 
 static_assert(
@@ -354,6 +396,10 @@ static_assert(
 static_assert(
    sizeof(struct rogue_fwif_cmd_3d) <= ROGUE_FWIF_DM_INDEPENDENT_KICK_CMD_SIZE,
    "kernel expects command size be increased to match current 3D command size");
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+static_assert(sizeof(struct rogue_fwif_cmd_3d) == 320U,
+              "TH1520 1.17 Services firmware requires a 320-byte 3D command");
+#endif
 
 struct rogue_fwif_transfer_regs {
    /**
@@ -373,8 +419,10 @@ struct rogue_fwif_transfer_regs {
    uint32_t isp_render_origin;
    uint32_t isp_ctl;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature S7_TOP_INFRASTRUCTURE present. */
    uint32_t isp_xtp_pipe_enable;
+#endif
    uint32_t isp_aa;
 
    uint32_t event_pixel_pds_info;
@@ -395,7 +443,11 @@ struct rogue_fwif_transfer_regs {
 
    uint64_t isp_mtile_base;
    /* TQ_MAX_RENDER_TARGETS * PBE_STATE_SIZE */
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+#define ROGUE_PBE_WORDS_REQUIRED_FOR_TQS 2
+#else
 #define ROGUE_PBE_WORDS_REQUIRED_FOR_TQS 3
+#endif
    uint64_t pbe_wordx_mrty[PVR_TRANSFER_MAX_RENDER_TARGETS *
                            ROGUE_PBE_WORDS_REQUIRED_FOR_TQS];
 };
@@ -421,6 +473,10 @@ static_assert(
    sizeof(struct rogue_fwif_cmd_transfer) <=
       ROGUE_FWIF_DM_INDEPENDENT_KICK_CMD_SIZE,
    "kernel expects command size be increased to match current TRANSFER command size");
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+static_assert(sizeof(struct rogue_fwif_cmd_transfer) == 160U,
+              "TH1520 1.17 Services firmware requires a 160-byte transfer command");
+#endif
 
 struct rogue_fwif_2d_regs {
    uint64_t tla_cmd_stream;
@@ -462,6 +518,16 @@ struct rogue_fwif_cmd_abort {
 struct rogue_fwif_cdm_regs {
    uint64_t tpu_border_colour_table;
 
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+   /* BXM 36.52 has TPU_DM_GLOBAL_REGISTERS. Services 1.17 places this
+    * 64-bit register before the control-stream and context-state addresses. */
+   uint64_t tpu_tag_cdm_ctrl;
+
+   uint64_t cdm_ctrl_stream_base;
+   uint64_t cdm_context_state_base_addr;
+   uint32_t cdm_resume_pds1;
+   uint32_t padding;
+#else
    /* Only used when feature CDM_USER_MODE_QUEUE present. */
    uint64_t cdm_cb_queue;
 
@@ -490,6 +556,7 @@ struct rogue_fwif_cdm_regs {
    uint32_t tpu_tag_cdm_ctrl;
 
    uint32_t padding;
+#endif
 };
 
 /**
@@ -503,11 +570,15 @@ struct rogue_fwif_cmd_compute {
    alignas(8) struct rogue_fwif_cdm_regs regs;
    alignas(8) uint32_t flags;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used when feature UNIFIED_STORE_VIRTUAL_PARTITIONING present. */
    uint32_t num_temp_regions;
+#endif
 
    /* Only used when feature CDM_USER_MODE_QUEUE present. */
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    uint32_t stream_start_offset;
+#endif
 
    /* Number of tiles to submit to GPU<N> before moving to GPU<N+1>. */
    /* Only used when feature GPU_MULTICORE_SUPPORT present. */
@@ -522,6 +593,10 @@ static_assert(
    sizeof(struct rogue_fwif_cmd_compute) <=
       ROGUE_FWIF_DM_INDEPENDENT_KICK_CMD_SIZE,
    "kernel expects command size be increased to match current COMPUTE command size");
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+static_assert(sizeof(struct rogue_fwif_cmd_compute) == 56U,
+              "TH1520 1.17 Services firmware requires a 56-byte compute command");
+#endif
 
 /* TODO: Rename the RGX_* macros in the comments once they are imported. */
 /* Applied to RGX_CR_VDM_SYNC_PDS_DATA_BASE. */

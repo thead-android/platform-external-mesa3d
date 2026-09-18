@@ -38,13 +38,18 @@
 #include "util/macros.h"
 #include "vk_log.h"
 
-#define vk_bridge_err(vk_err, bridge_func, bridge_ret)  \
-   vk_errorf(NULL,                                      \
-             vk_err,                                    \
-             "%s failed, PVR_SRV_ERROR: %d, Errno: %s", \
-             bridge_func,                               \
-             (bridge_ret).error,                        \
-             strerror(errno))
+#define vk_bridge_err(vk_err, bridge_func, bridge_ret)                       \
+   (mesa_loge("PVRBRIDGE %s failed: PVR_SRV_ERROR=%d errno=%d (%s)",         \
+              bridge_func,                                                  \
+              (bridge_ret).error,                                           \
+              errno,                                                        \
+              strerror(errno)),                                             \
+    vk_errorf(NULL,                                                         \
+              vk_err,                                                       \
+              "%s failed, PVR_SRV_ERROR: %d, Errno: %s",                   \
+              bridge_func,                                                  \
+              (bridge_ret).error,                                           \
+              strerror(errno)))
 
 static int pvr_srv_bridge_call(int fd,
                                uint8_t bridge_id,

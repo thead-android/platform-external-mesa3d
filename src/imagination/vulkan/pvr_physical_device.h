@@ -27,7 +27,8 @@
 #include "pvr_device_info.h"
 #include "pvr_formats.h"
 
-#if defined(VK_USE_PLATFORM_DISPLAY_KHR) || defined(VK_USE_PLATFORM_WAYLAND_KHR)
+#if defined(VK_USE_PLATFORM_DISPLAY_KHR) || \
+    defined(VK_USE_PLATFORM_WAYLAND_KHR)
 #   define PVR_USE_WSI_PLATFORM true
 #else
 #   define PVR_USE_WSI_PLATFORM false

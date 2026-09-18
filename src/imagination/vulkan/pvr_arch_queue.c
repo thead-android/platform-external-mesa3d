@@ -830,8 +830,12 @@ static VkResult pvr_process_cmd_buffer(struct pvr_device *device,
          result = vk_error(device, VK_ERROR_OUT_OF_HOST_MEMORY);
       }
 
-      if (result != VK_SUCCESS)
+      if (result != VK_SUCCESS) {
+         mesa_loge("PVRQ sub-command failed: type=%u result=%d",
+                   sub_cmd->type,
+                   result);
          return result;
+      }
 
       p_atomic_inc(&device->global_cmd_buffer_submit_count);
    }
@@ -1000,15 +1004,21 @@ static VkResult pvr_driver_queue_submit(struct vk_queue *queue,
    VkResult result;
 
    result = pvr_clear_last_submits_syncs(driver_queue);
-   if (result != VK_SUCCESS)
+   if (result != VK_SUCCESS) {
+      mesa_loge("PVRQ clear-last-submits failed: result=%d", result);
       return result;
+   }
 
    if (submit->wait_count) {
       result = pvr_process_queue_waits(driver_queue,
                                        submit->waits,
                                        submit->wait_count);
-      if (result != VK_SUCCESS)
+      if (result != VK_SUCCESS) {
+         mesa_loge("PVRQ process-waits failed: waits=%u result=%d",
+                   submit->wait_count,
+                   result);
          return result;
+      }
    }
 
    struct pvr_rt_dataset **suspended_rts = NULL;
@@ -1019,8 +1029,13 @@ static VkResult pvr_driver_queue_submit(struct vk_queue *queue,
          driver_queue,
          container_of(submit->command_buffers[i], struct pvr_cmd_buffer, vk),
          &suspended_rts);
-      if (result != VK_SUCCESS)
+      if (result != VK_SUCCESS) {
+         mesa_loge("PVRQ command-buffer failed: index=%u count=%u result=%d",
+                   i,
+                   submit->command_buffer_count,
+                   result);
          return result;
+      }
    }
 
    assert(suspended_rts == NULL && "suspended graphics job never resumed");
@@ -1028,8 +1043,12 @@ static VkResult pvr_driver_queue_submit(struct vk_queue *queue,
    result = pvr_process_queue_signals(driver_queue,
                                       submit->signals,
                                       submit->signal_count);
-   if (result != VK_SUCCESS)
+   if (result != VK_SUCCESS) {
+      mesa_loge("PVRQ process-signals failed: signals=%u result=%d",
+                submit->signal_count,
+                result);
       return result;
+   }
 
    return VK_SUCCESS;
 }

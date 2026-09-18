@@ -35,9 +35,20 @@
 
 VkResult pvr_srv_create_timeline(int render_fd, int *const fd_out)
 {
+   static const char pvr_sync_path[] = "/dev/pvr_sync";
    const char *render_path;
    VkResult result;
    int fd;
+
+   /* Services kernels built with USE_PVRSYNC_DEVNODE expose timelines through
+    * a dedicated misc device. Opening another render node only works for the
+    * alternative DRM-integrated sync configuration.
+    */
+   fd = open(pvr_sync_path, O_CLOEXEC | O_RDWR);
+   if (fd >= 0) {
+      *fd_out = fd;
+      return VK_SUCCESS;
+   }
 
    render_path = drmGetRenderDeviceNameFromFd(render_fd);
    if (!render_path) {

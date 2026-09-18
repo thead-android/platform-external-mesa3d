@@ -60,7 +60,8 @@
 struct pvr_srv_winsys_free_list {
    struct pvr_winsys_free_list base;
 
-   void *handle;
+   void *handles[ROGUE_FWIF_NUM_GEOMDATAS];
+   uint32_t handle_count;
 
    struct pvr_srv_winsys_free_list *parent;
 };
@@ -107,6 +108,10 @@ VkResult pvr_srv_winsys_free_list_create(
    struct pvr_srv_winsys_bo *srv_free_list_bo =
       to_pvr_srv_winsys_bo(free_list_vma->bo);
    struct pvr_srv_winsys_free_list *srv_free_list;
+   const uint32_t handle_count =
+      parent_free_list ? ROGUE_FWIF_NUM_GEOMDATAS
+                       : ROGUE_FW_MAX_FREELISTS - 1U;
+   const uint64_t free_list_stride = max_num_pages * sizeof(uint32_t);
    void *parent_handle;
    VkResult result;
 
@@ -119,36 +124,53 @@ VkResult pvr_srv_winsys_free_list_create(
 
    if (parent_free_list) {
       srv_free_list->parent = to_pvr_srv_winsys_free_list(parent_free_list);
-      parent_handle = srv_free_list->parent->handle;
+      parent_handle = srv_free_list->parent->handles[0];
    } else {
       srv_free_list->parent = NULL;
       parent_handle = NULL;
    }
 
-   result = pvr_srv_rgx_create_free_list(ws->render_fd,
-                                         srv_ws->server_memctx_data,
-                                         max_num_pages,
-                                         initial_num_pages,
-                                         grow_num_pages,
-                                         grow_threshold,
-                                         parent_handle,
+   assert(free_list_vma->size >= free_list_stride * handle_count);
+
+   for (uint32_t i = 0; i < handle_count; i++) {
+      result = pvr_srv_rgx_create_free_list(ws->render_fd,
+                                            srv_ws->server_memctx_data,
+                                            max_num_pages,
+                                            initial_num_pages,
+                                            grow_num_pages,
+                                            grow_threshold,
+                                            parent_handle,
 #if MESA_DEBUG
-                                         PVR_SRV_TRUE /* free_list_check */,
+                                            PVR_SRV_TRUE /* free_list_check */,
 #else
-                                         PVR_SRV_FALSE /* free_list_check */,
+                                            PVR_SRV_FALSE /* free_list_check */,
 #endif
-                                         free_list_vma->dev_addr,
-                                         srv_free_list_bo->pmr,
-                                         0 /* pmr_offset */,
-                                         &srv_free_list->handle);
-   if (result != VK_SUCCESS)
-      goto err_vk_free_srv_free_list;
+                                            PVR_DEV_ADDR_OFFSET(
+                                               free_list_vma->dev_addr,
+                                               free_list_stride * i),
+                                            srv_free_list_bo->pmr,
+                                            free_list_vma->bo_offset +
+                                               free_list_stride * i,
+                                            &srv_free_list->handles[i]);
+      if (result != VK_SUCCESS)
+         goto err_destroy_free_lists;
+
+      srv_free_list->handle_count++;
+   }
 
    srv_free_list->base.ws = ws;
 
    *free_list_out = &srv_free_list->base;
 
    return VK_SUCCESS;
+
+err_destroy_free_lists:
+   while (srv_free_list->handle_count > 0) {
+      srv_free_list->handle_count--;
+      pvr_srv_rgx_destroy_free_list(
+         ws->render_fd,
+         srv_free_list->handles[srv_free_list->handle_count]);
+   }
 
 err_vk_free_srv_free_list:
    vk_free(ws->alloc, srv_free_list);
@@ -162,7 +184,12 @@ void pvr_srv_winsys_free_list_destroy(struct pvr_winsys_free_list *free_list)
    struct pvr_srv_winsys_free_list *srv_free_list =
       to_pvr_srv_winsys_free_list(free_list);
 
-   pvr_srv_rgx_destroy_free_list(srv_ws->base.render_fd, srv_free_list->handle);
+   while (srv_free_list->handle_count > 0) {
+      srv_free_list->handle_count--;
+      pvr_srv_rgx_destroy_free_list(
+         srv_ws->base.render_fd,
+         srv_free_list->handles[srv_free_list->handle_count]);
+   }
    vk_free(srv_ws->base.alloc, srv_free_list);
 }
 

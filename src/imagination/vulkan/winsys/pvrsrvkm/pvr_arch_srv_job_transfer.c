@@ -62,9 +62,21 @@ srv_transfer_cmd_stream_load(struct rogue_fwif_cmd_transfer *const cmd,
    memcpy(&regs->isp_mtile_base, stream_ptr, sizeof(regs->isp_mtile_base));
    stream_ptr += pvr_cmd_length(CR_ISP_MTILE_BASE);
 
-   STATIC_ASSERT(ARRAY_SIZE(regs->pbe_wordx_mrty) == 9U);
+   STATIC_ASSERT(ARRAY_SIZE(regs->pbe_wordx_mrty) ==
+                 PVR_TRANSFER_MAX_RENDER_TARGETS *
+                    ROGUE_PBE_WORDS_REQUIRED_FOR_TQS);
    STATIC_ASSERT(sizeof(regs->pbe_wordx_mrty[0]) == sizeof(uint64_t));
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+   /* Mesa's internal stream has three PBE words for each of the three MRTs;
+    * the TH1520 1.17 firmware interface consumes the first two. */
+   for (uint32_t i = 0; i < PVR_TRANSFER_MAX_RENDER_TARGETS; i++) {
+      memcpy(&regs->pbe_wordx_mrty[i * ROGUE_PBE_WORDS_REQUIRED_FOR_TQS],
+             stream_ptr + i * 3U * 2U,
+             ROGUE_PBE_WORDS_REQUIRED_FOR_TQS * sizeof(uint64_t));
+   }
+#else
    memcpy(regs->pbe_wordx_mrty, stream_ptr, sizeof(regs->pbe_wordx_mrty));
+#endif
    stream_ptr += 9U * 2U;
 
    regs->isp_bgobjvals = *stream_ptr;

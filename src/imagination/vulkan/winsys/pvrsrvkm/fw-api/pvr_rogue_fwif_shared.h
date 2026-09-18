@@ -30,10 +30,17 @@
 #include "util/macros.h"
 
 /** Indicates the number of RTDATAs per RTDATASET. */
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+#define ROGUE_FWIF_NUM_RTDATAS 4U
+#define ROGUE_FWIF_NUM_GEOMDATAS 4U
+#define ROGUE_FWIF_NUM_RTDATA_FREELISTS 12U
+#define ROGUE_NUM_GEOM_CORES 2U
+#else
 #define ROGUE_FWIF_NUM_RTDATAS 2U
 #define ROGUE_FWIF_NUM_GEOMDATAS 1U
 #define ROGUE_FWIF_NUM_RTDATA_FREELISTS 2U
 #define ROGUE_NUM_GEOM_CORES 1U
+#endif
 
 #define ROGUE_NUM_GEOM_CORES_SIZE 2U
 
@@ -187,17 +194,24 @@ struct rogue_fwif_cccb_ctl {
    /* Only used if SUPPORT_AGP is present. */
    uint32_t read_offset2;
 
+#if !defined(PVR_SUPPORT_SERVICES_DRIVER)
    /* Only used if SUPPORT_AGP4 is present. */
    uint32_t read_offset3;
    /* Only used if SUPPORT_AGP4 is present. */
    uint32_t read_offset4;
 
    uint32_t padding;
+#endif
 };
 
 #define ROGUE_FW_LOCAL_FREELIST 0U
 #define ROGUE_FW_GLOBAL_FREELIST 1U
+#if defined(PVR_SUPPORT_SERVICES_DRIVER)
+#define ROGUE_FW_GLOBAL2_FREELIST 2U
+#define ROGUE_FW_MAX_FREELISTS (ROGUE_FW_GLOBAL2_FREELIST + 1U)
+#else
 #define ROGUE_FW_MAX_FREELISTS (ROGUE_FW_GLOBAL_FREELIST + 1U)
+#endif
 #define ROGUE_FW_MAX_HWFREELISTS 2U
 
 /**

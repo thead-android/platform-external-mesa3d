@@ -34,10 +34,11 @@ struct pvr_rt_dataset {
    struct pvr_free_list *local_free_list;
 
    struct pvr_bo *vheap_rtc_bo;
-   pvr_dev_addr_t vheap_dev_addr;
-   pvr_dev_addr_t rtc_dev_addr;
+   pvr_dev_addr_t vheap_dev_addrs[ROGUE_NUM_GEOMDATAS];
+   pvr_dev_addr_t rtc_dev_addrs[ROGUE_NUM_GEOMDATAS];
 
    struct pvr_bo *tpc_bo;
+   pvr_dev_addr_t tpc_dev_addrs[ROGUE_NUM_GEOMDATAS];
    uint64_t tpc_stride;
    uint64_t tpc_size;
 

@@ -12,6 +12,8 @@
 
 #include "pvr_device.h"
 
+#include <stdio.h>
+
 #include "vk_log.h"
 
 #include "hwdef/pvr_hw_utils.h"
@@ -60,11 +62,11 @@
  * TODO: Investigate if a different default size can improve the overall
  * performance of internal driver allocations.
  */
-#define PVR_SUBALLOCATOR_GENERAL_SIZE (128 * 1024)
-#define PVR_SUBALLOCATOR_PDS_SIZE (128 * 1024)
-#define PVR_SUBALLOCATOR_TRANSFER_SIZE (128 * 1024)
-#define PVR_SUBALLOCATOR_USC_SIZE (128 * 1024)
-#define PVR_SUBALLOCATOR_VIS_TEST_SIZE (128 * 1024)
+#define PVR_SUBALLOCATOR_GENERAL_SIZE (1 * 1024 * 1024)
+#define PVR_SUBALLOCATOR_PDS_SIZE (1 * 1024 * 1024)
+#define PVR_SUBALLOCATOR_TRANSFER_SIZE (1 * 1024 * 1024)
+#define PVR_SUBALLOCATOR_USC_SIZE (1 * 1024 * 1024)
+#define PVR_SUBALLOCATOR_VIS_TEST_SIZE (1 * 1024 * 1024)
 
 static uint32_t pvr_get_simultaneous_num_allocs(
    const struct pvr_device_info *dev_info,
@@ -854,6 +856,8 @@ VkResult PVR_PER_ARCH(create_device)(struct pvr_physical_device *pdevice,
    device->global_cmd_buffer_submit_count = 0;
    device->global_queue_present_count = 0;
 
+   device->eot_program_cache_count = 0;
+   simple_mtx_init(&device->eot_program_cache_mtx, mtx_plain);
    simple_mtx_init(&device->rs_mtx, mtx_plain);
    list_inithead(&device->render_states);
 
@@ -946,6 +950,16 @@ void PVR_PER_ARCH(destroy_device)(struct pvr_device *device,
    pvr_robustness_buffer_finish(device);
    pvr_spm_finish_scratch_buffer_store(device);
    pvr_arch_queues_destroy(device);
+
+   for (uint32_t i = 0; i < device->eot_program_cache_count; i++) {
+      struct pvr_eot_program_cache_entry *entry =
+         &device->eot_program_cache[i];
+
+      pvr_bo_suballoc_free(entry->pds_pixel_event_program.pvr_bo);
+      pvr_bo_suballoc_free(entry->usc_program);
+   }
+   simple_mtx_destroy(&device->eot_program_cache_mtx);
+
    pvr_device_finish_tile_buffer_state(device);
    pvr_arch_device_finish_spm_load_state(device);
    pvr_device_finish_graphics_static_clear_state(device);
