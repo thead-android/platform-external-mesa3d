@@ -2715,6 +2715,22 @@ pvr_preprocess_shader_data(pco_data *data,
       if (state->ms)
          data->fs.uses.alpha_to_coverage = state->ms->alpha_to_coverage_enable;
 
+      /* Do not generate generic per-fragment MSAA checks when all relevant
+       * pipeline values are fixed and have no effect. Shader discard and
+       * shader-written sample masks are still handled by PFO itself.
+       */
+      data->fs.trivial_static_msaa =
+         state->ms && state->cb &&
+         !BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_RASTERIZATION_SAMPLES) &&
+         !BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_SAMPLE_MASK) &&
+         !BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_ALPHA_TO_COVERAGE_ENABLE) &&
+         !BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_MS_ALPHA_TO_ONE_ENABLE) &&
+         !BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_CB_COLOR_WRITE_ENABLES) &&
+         state->ms->rasterization_samples == VK_SAMPLE_COUNT_1_BIT &&
+         (state->ms->sample_mask & 1) &&
+         !state->ms->alpha_to_coverage_enable &&
+         !state->ms->alpha_to_one_enable;
+
       if (BITSET_TEST(state->dynamic, MESA_VK_DYNAMIC_CB_COLOR_WRITE_ENABLES) ||
           (state->cb && state->cb->color_write_enables !=
                            BITFIELD_MASK(MESA_VK_MAX_COLOR_ATTACHMENTS))) {

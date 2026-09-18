@@ -905,7 +905,7 @@ void pco_lower_nir(pco_ctx *ctx, nir_shader *nir, pco_data *data)
    NIR_PASS(_, nir, pco_nir_lower_tex, data, ctx);
 
    if (nir->info.stage == MESA_SHADER_FRAGMENT) {
-      NIR_PASS(_, nir, pco_nir_lower_alpha_to_coverage);
+      NIR_PASS(_, nir, pco_nir_lower_alpha_to_coverage, &data->fs);
 
       NIR_PASS(_, nir, nir_lower_blend, &data->fs.blend_opts);
 

@@ -559,7 +559,7 @@ static bool lower_isp_fb(nir_builder *b, struct pfo_state *state)
       has_depth_feedback = true;
    }
 
-   if (!state->has_sample_check) {
+   if (!state->has_sample_check && !state->fs->trivial_static_msaa) {
       b->cursor = nir_after_instr(&state->last_discard_store->instr);
 
       nir_def *smp_msk = nir_ishl(b, nir_imm_int(b, 1), nir_load_sample_id(b));
@@ -574,6 +574,11 @@ static bool lower_isp_fb(nir_builder *b, struct pfo_state *state)
       state->has_sample_check = true;
       state->has_discards = true;
    }
+
+   state->fs->uses.discard = state->has_discards;
+   state->fs->uses.depth_feedback = has_depth_feedback;
+   if (!state->has_discards && !has_depth_feedback)
+      return false;
 
    /* Insert isp feedback instruction before the first store,
     * or if there are no stores, at the end.
@@ -592,9 +597,6 @@ static bool lower_isp_fb(nir_builder *b, struct pfo_state *state)
       state->has_discards ? nir_i2b(b, nir_load_reg(b, state->discard_cond_reg))
                           : undef,
       has_depth_feedback ? state->depth_feedback_src : undef);
-
-   state->fs->uses.discard = state->has_discards;
-   state->fs->uses.depth_feedback = has_depth_feedback;
 
    return true;
 }
@@ -702,9 +704,9 @@ static bool lower_demote_samples(nir_builder *b,
    return true;
 }
 
-bool pco_nir_lower_alpha_to_coverage(nir_shader *shader)
+bool pco_nir_lower_alpha_to_coverage(nir_shader *shader, const pco_fs_data *fs)
 {
-   if (shader->info.internal)
+   if (shader->info.internal || fs->trivial_static_msaa)
       return false;
 
    nir_builder b = nir_builder_create(nir_shader_get_entrypoint(shader));
@@ -852,7 +854,7 @@ bool pco_nir_pfo(nir_shader *shader, pco_fs_data *fs)
    /* TODO: instead of doing multiple passes, probably better to just cache all
     * the stores
     */
-   if (!shader->info.internal) {
+   if (!shader->info.internal && !fs->trivial_static_msaa) {
       progress |= nir_shader_lower_instructions(shader,
                                                 is_frag_color_out,
                                                 lower_alpha_to_one,
