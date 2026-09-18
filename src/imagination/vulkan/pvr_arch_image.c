@@ -121,7 +121,13 @@ VkResult PVR_PER_ARCH(CreateImageView)(VkDevice _device,
    info.sample_count = image->vk.samples;
    info.addr = image->dev_addr;
 
-   info.format = pCreateInfo->format;
+   /* Android external-format views may request VK_FORMAT_UNDEFINED.  The
+    * common vk_image_view initialization resolves this to the image format;
+    * use that resolved value when packing the hardware texture descriptor.
+    * Passing UNDEFINED here produces an invalid hardware format and corrupts
+    * the descriptor, even though image import and CPU buffer contents are valid.
+    */
+   info.format = iview->vk.format;
    info.layer_size = plane->layer_size;
 
    if (image->vk.create_flags & VK_IMAGE_CREATE_2D_VIEW_COMPATIBLE_BIT_EXT) {
