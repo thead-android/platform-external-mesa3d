@@ -17,12 +17,15 @@ package {
 genrule {
     name: "git_sha1.h",
     out: [
-        "git_sha1.h",
+        "src/git_sha1.h",
+    ],
+    export_include_dirs: [
+        "src",
     ],
     tools: [
         "git_sha1_py_binary",
     ],
-    cmd: "$(location git_sha1_py_binary) --output $(location git_sha1.h)",
+    cmd: "$(location git_sha1_py_binary) --output $(location src/git_sha1.h)",
 }
 
 cc_library_headers {

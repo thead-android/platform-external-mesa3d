@@ -462,6 +462,17 @@ cc_defaults {
 }
 
 cc_defaults {
+    name: "ld_args_build_id",
+    vendor: true,
+    ldflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-Wl,--build-id=sha1",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
     name: "ld_args_gc_sections",
     vendor: true,
     host_supported: true,

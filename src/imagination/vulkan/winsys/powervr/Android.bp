@@ -1,0 +1,27 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "pvr_files",
+    srcs: [
+        "pvr_drm.c",
+        "pvr_drm_bo.c",
+        "pvr_drm_job_compute.c",
+        "pvr_drm_job_null.c",
+        "pvr_drm_job_render.c",
+        "pvr_drm_job_transfer.c",
+    ],
+}

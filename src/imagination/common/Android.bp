@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "powervr_common_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "powervr_common",
+    vendor: true,
+    c_std: "c11",
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "no_override_init_args",
+        "powervr_common_c_flags",
+    ],
+    header_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "inc_imagination",
+            "inc_include",
+            "inc_src",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "git_sha1.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "pvr_debug.c",
+            "pvr_device_info.c",
+            "pvr_dump.c",
+            "pvr_dump_info.c",
+            "pvr_util.c",
+            "pvr_ycbcr.c",
+        ],
+        (default, default): [],
+    }),
+}

@@ -1,0 +1,386 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+python_binary_host {
+    name: "pco_builder_ops.h_py_binary",
+    main: "pco_builder_ops_h.py",
+    srcs: [
+        "pco_builder_ops_h.py",
+        "pco_isa.py",
+        "pco_map.py",
+        "pco_ops.py",
+        "pco_pygen_common.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "pco_common.h_py_binary",
+    main: "pco_common_h.py",
+    srcs: [
+        "pco_common_h.py",
+        "pco_isa.py",
+        "pco_map.py",
+        "pco_ops.py",
+        "pco_pygen_common.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "pco_info.c_py_binary",
+    main: "pco_info_c.py",
+    srcs: [
+        "pco_info_c.py",
+        "pco_isa.py",
+        "pco_map.py",
+        "pco_ops.py",
+        "pco_pygen_common.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "pco_isa.h_py_binary",
+    main: "pco_isa_h.py",
+    srcs: [
+        "pco_isa_h.py",
+        "pco_isa.py",
+        "pco_map.py",
+        "pco_ops.py",
+        "pco_pygen_common.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "pco_map.h_py_binary",
+    main: "pco_map_h.py",
+    srcs: [
+        "pco_isa.py",
+        "pco_map_h.py",
+        "pco_map.py",
+        "pco_ops.py",
+        "pco_pygen_common.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "pco_nir_algebraic_py_binary",
+    main: "pco_nir_algebraic.py",
+    srcs: [
+        ":nir_algebraic.py",
+        ":nir_opcodes.py",
+        "pco_nir_algebraic.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "pco_ops.h_py_binary",
+    main: "pco_ops_h.py",
+    srcs: [
+        "pco_isa.py",
+        "pco_map.py",
+        "pco_ops_h.py",
+        "pco_ops.py",
+        "pco_pygen_common.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "pco_builder_ops.h",
+    out: [
+        "src/imagination/pco/pco_builder_ops.h",
+    ],
+    tools: [
+        "pco_builder_ops.h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/pco",
+    ],
+    cmd: "$(location pco_builder_ops.h_py_binary) > $(location " +
+        "src/imagination/pco/pco_builder_ops.h)",
+}
+
+genrule {
+    name: "pco_common.h",
+    out: [
+        "src/imagination/pco/pco_common.h",
+    ],
+    tools: [
+        "pco_common.h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/pco",
+    ],
+    cmd: "$(location pco_common.h_py_binary) > $(location " +
+        "src/imagination/pco/pco_common.h)",
+}
+
+genrule {
+    name: "pco_info.c",
+    out: [
+        "pco_info.c",
+    ],
+    tools: [
+        "pco_info.c_py_binary",
+    ],
+    cmd: "$(location pco_info.c_py_binary) > $(location pco_info.c)",
+}
+
+genrule {
+    name: "pco_isa.h",
+    out: [
+        "src/imagination/pco/pco_isa.h",
+    ],
+    tools: [
+        "pco_isa.h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/pco",
+    ],
+    cmd: "$(location pco_isa.h_py_binary) > $(location " +
+        "src/imagination/pco/pco_isa.h)",
+}
+
+genrule {
+    name: "pco_map.h",
+    out: [
+        "src/imagination/pco/pco_map.h",
+    ],
+    tools: [
+        "pco_map.h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/pco",
+    ],
+    cmd: "$(location pco_map.h_py_binary) > $(location " +
+        "src/imagination/pco/pco_map.h)",
+}
+
+genrule {
+    name: "pco_nir_algebraic.c",
+    out: [
+        "pco_nir_algebraic.c",
+    ],
+    tools: [
+        "pco_nir_algebraic_py_binary",
+    ],
+    cmd: "$(location pco_nir_algebraic_py_binary) -p $(genDir)/src/compiler/nir/ " +
+        "> $(location pco_nir_algebraic.c)",
+}
+
+genrule {
+    name: "pco_ops.h",
+    out: [
+        "src/imagination/pco/pco_ops.h",
+    ],
+    tools: [
+        "pco_ops.h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/pco",
+    ],
+    cmd: "$(location pco_ops.h_py_binary) > $(location " +
+        "src/imagination/pco/pco_ops.h)",
+}
+
+cc_library_headers {
+    name: "inc_powervr_compiler",
+    vendor: true,
+    export_include_dirs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ".",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "powervr_compiler_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-Wno-psabi",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "powervr_compiler_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "powervr_compiler",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "no_override_init_args",
+        "powervr_compiler_c_flags",
+        "powervr_compiler_cpp_flags",
+    ],
+    header_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "hwvulkan_headers",
+            "inc_compiler",
+            "inc_imagination",
+            "inc_include",
+            "inc_nir",
+            "inc_powervr_compiler",
+            "inc_src",
+            "inc_src_imagination_pco_usclib",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "cdm.h",
+        "cr.h",
+        "ipf.h",
+        "ir_expression_operation.h",
+        "kmd_stream.h",
+        "lls.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "pbestate.h",
+        "pco_builder_ops.h",
+        "pco_common.h",
+        "pco_isa.h",
+        "pco_map.h",
+        "pco_ops.h",
+        "pco_usclib.h_headers",
+        "pds.h",
+        "ppp.h",
+        "shader_stats.h",
+        "texstate.h",
+        "u_format_gen.h",
+        "vdm.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ":pco_info.c",
+            ":pco_nir_algebraic.c",
+            ":pco_usclib.h_impl",
+            "pco.c",
+            "pco_binary.c",
+            "pco_bool.c",
+            "pco_cf.c",
+            "pco_const_imms.c",
+            "pco_debug.c",
+            "pco_end.c",
+            "pco_group_instrs.c",
+            "pco_index.c",
+            "pco_ir.c",
+            "pco_legalize.c",
+            "pco_nir.c",
+            "pco_nir_compute.c",
+            "pco_nir_io.c",
+            "pco_nir_lower_null_descriptors.c",
+            "pco_nir_pvfio.c",
+            "pco_nir_sync.c",
+            "pco_nir_tex.c",
+            "pco_nir_vk.c",
+            "pco_opt.c",
+            "pco_print.c",
+            "pco_ra.c",
+            "pco_schedule.c",
+            "pco_trans_nir.c",
+            "pco_validate.c",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "blake3",
+            "compiler",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+}

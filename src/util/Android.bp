@@ -86,7 +86,7 @@ genrule {
 genrule {
     name: "shader_stats.h",
     out: [
-        "shader_stats.h",
+        "src/util/shader_stats.h",
     ],
     srcs: [
         "shader_stats.rnc",
@@ -95,9 +95,13 @@ genrule {
     tools: [
         "process_shader_stats_py_binary",
     ],
+    export_include_dirs: [
+        "src",
+        "src/util",
+    ],
     cmd: "$(location process_shader_stats_py_binary) $(location " +
         "shader_stats.rnc) $(location shader_stats.xml) > $(location " +
-        "shader_stats.h)",
+        "src/util/shader_stats.h)",
 }
 
 cc_defaults {

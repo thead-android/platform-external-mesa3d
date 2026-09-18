@@ -1,0 +1,391 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+genrule {
+    name: "powervr_mesa_devenv_icd",
+    out: [
+        "powervr_mesa_devenv_icd.riscv64.json",
+    ],
+    srcs: [
+        ":vk_api_xml",
+    ],
+    tools: [
+        "vk_icd_py_binary",
+    ],
+    cmd: "$(location vk_icd_py_binary) --api-version 1.4 --xml $(location " +
+        ":vk_api_xml) --sizeof-pointer 8 --icd-lib-path $(genDir) " +
+        "--icd-filename libvulkan_powervr_mesa.so --out $(location " +
+        "powervr_mesa_devenv_icd.riscv64.json)",
+}
+
+genrule {
+    name: "pvr_entrypoints_headers",
+    out: [
+        "src/imagination/vulkan/pvr_entrypoints.h",
+    ],
+    srcs: [
+        ":vk_api_xml",
+    ],
+    tools: [
+        "vk_entrypoints_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/vulkan",
+    ],
+    cmd: "$(location vk_entrypoints_py_binary) --xml $(location :vk_api_xml) " +
+        "--proto --weak --out-h $(location " +
+        "src/imagination/vulkan/pvr_entrypoints.h) --out-c " +
+        "$(genDir)/src/imagination/vulkan/pvr_entrypoints.c --prefix pvr " +
+        "--device-prefix pvr_rogue --beta false",
+}
+
+genrule {
+    name: "pvr_entrypoints_impl",
+    out: [
+        "src/imagination/vulkan/pvr_entrypoints.c",
+    ],
+    srcs: [
+        ":vk_api_xml",
+    ],
+    tools: [
+        "vk_entrypoints_py_binary",
+    ],
+    cmd: "$(location vk_entrypoints_py_binary) --xml $(location :vk_api_xml) " +
+        "--proto --weak --out-h " +
+        "$(genDir)/src/imagination/vulkan/pvr_entrypoints.h --out-c $(location " +
+        "src/imagination/vulkan/pvr_entrypoints.c) --prefix pvr --device-prefix " +
+        "pvr_rogue --beta false",
+}
+
+cc_library_headers {
+    name: "libpowervr_pds_includes",
+    vendor: true,
+    export_include_dirs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ".",
+            "pds",
+            "pds/pvr_pds_programs",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "powervr_rogue_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DPVR_BUILD_ARCH_ROGUE",
+            "-DPVR_SUPPORT_SERVICES_DRIVER",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "vulkan_powervr_mesa_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DPVR_SUPPORT_SERVICES_DRIVER",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "vulkan_powervr_mesa_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "powervr_rogue",
+    vendor: true,
+    c_std: "c11",
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "no_override_init_args",
+        "powervr_rogue_c_flags",
+        "vulkan_wsi_list",
+    ],
+    header_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "inc_compiler",
+            "inc_imagination",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_src_imagination_pco_uscgen",
+            "inc_src_vulkan_runtime",
+            "inc_src_vulkan_util",
+            "inc_src_vulkan_wsi",
+            "libcutils_headers",
+            "libdrm_headers",
+            "libpowervr_pds_includes",
+            "pvr_includes",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "cdm.h",
+        "cr.h",
+        "git_sha1.h",
+        "ipf.h",
+        "ir_expression_operation.h",
+        "kmd_stream.h",
+        "lls.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "pbestate.h",
+        "pco_common.h",
+        "pco_uscgen_programs_headers",
+        "pds.h",
+        "ppp.h",
+        "pvr_entrypoints_headers",
+        "shader_stats.h",
+        "spirv_info_headers",
+        "texstate.h",
+        "u_format_gen.h",
+        "vdm.h",
+        "vk_cmd_enqueue_entrypoints_headers",
+        "vk_cmd_queue_headers",
+        "vk_common_entrypoints_headers",
+        "vk_dispatch_table_headers",
+        "vk_enum_to_str_headers",
+        "vk_extensions_headers",
+        "vk_physical_device_features_headers",
+        "vk_physical_device_properties_headers",
+        "vk_struct_type_cast",
+        "wsi_entrypoints_headers",
+    ],
+    srcs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ":rogue_files",
+            "pvr_arch_border.c",
+            "pvr_arch_cmd_buffer.c",
+            "pvr_arch_cmd_query.c",
+            "pvr_arch_csb.c",
+            "pvr_arch_descriptor_set.c",
+            "pvr_arch_device.c",
+            "pvr_arch_formats.c",
+            "pvr_arch_framebuffer.c",
+            "pvr_arch_hw_pass.c",
+            "pvr_arch_image.c",
+            "pvr_arch_job_common.c",
+            "pvr_arch_job_compute.c",
+            "pvr_arch_job_context.c",
+            "pvr_arch_job_render.c",
+            "pvr_arch_job_transfer.c",
+            "pvr_arch_mrt.c",
+            "pvr_arch_pass.c",
+            "pvr_arch_pipeline.c",
+            "pvr_arch_query_compute.c",
+            "pvr_arch_queue.c",
+            "pvr_arch_sampler.c",
+            "pvr_arch_spm.c",
+            "pvr_arch_tex_state.c",
+            "winsys/pvrsrvkm/pvr_arch_srv_job_compute.c",
+            "winsys/pvrsrvkm/pvr_arch_srv_job_render.c",
+            "winsys/pvrsrvkm/pvr_arch_srv_job_transfer.c",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_shared {
+    name: "vulkan.powervr",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "ld_args_bsymbolic",
+        "ld_args_build_id",
+        "ld_args_gc_sections",
+        "no_override_init_args",
+        "vulkan_powervr_mesa_c_flags",
+        "vulkan_powervr_mesa_cpp_flags",
+        "vulkan_wsi_list",
+    ],
+    header_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "hwvulkan_headers",
+            "inc_compiler",
+            "inc_imagination",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_src_imagination_pco_uscgen",
+            "inc_src_vulkan_runtime",
+            "inc_src_vulkan_util",
+            "inc_src_vulkan_wsi",
+            "inc_util",
+            "inc_util_c11",
+            "libpowervr_pds_includes",
+            "pvr_includes",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "cdm.h",
+        "cr.h",
+        "ipf.h",
+        "ir_expression_operation.h",
+        "kmd_stream.h",
+        "lls.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "pbestate.h",
+        "pco_common.h",
+        "pco_uscgen_programs_headers",
+        "pds.h",
+        "ppp.h",
+        "pvr_entrypoints_headers",
+        "shader_stats.h",
+        "spirv_info_headers",
+        "texstate.h",
+        "u_format_gen.h",
+        "git_sha1.h",
+        "pco_usclib.h_headers",
+        "u_format_pack.h",
+        "vdm.h",
+        "vk_cmd_enqueue_entrypoints_headers",
+        "vk_cmd_queue_headers",
+        "vk_common_entrypoints_headers",
+        "vk_dispatch_table_headers",
+        "vk_enum_to_str_headers",
+        "vk_extensions_headers",
+        "vk_physical_device_features_headers",
+        "vk_physical_device_properties_headers",
+        "vk_struct_type_cast",
+        "wsi_entrypoints_headers",
+    ],
+    srcs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ":pco_uscgen_programs_impl",
+            ":pvr_entrypoints_impl",
+            ":pvr_files",
+            ":pvr_files_1",
+            "pvr_bo.c",
+            "pvr_csb.c",
+            "pvr_descriptor_set.c",
+            "pvr_device.c",
+            "pvr_dump_bo.c",
+            "pvr_formats.c",
+            "pvr_free_list.c",
+            "pvr_image.c",
+            "pvr_instance.c",
+            "pvr_nir_lower_ycbcr.c",
+            "pvr_physical_device.c",
+            "pvr_query.c",
+            "pvr_robustness.c",
+            "pvr_rt_dataset.c",
+            "pvr_spm.c",
+            "pvr_transfer_frag_store.c",
+            "pvr_usc.c",
+            "pvr_wsi.c",
+            "winsys/pvrsrvkm/pvr_srv.c",
+            "winsys/pvrsrvkm/pvr_srv_bo.c",
+            "winsys/pvrsrvkm/pvr_srv_bridge.c",
+            "winsys/pvrsrvkm/pvr_srv_job_common.c",
+            "winsys/pvrsrvkm/pvr_srv_job_compute.c",
+            "winsys/pvrsrvkm/pvr_srv_job_null.c",
+            "winsys/pvrsrvkm/pvr_srv_job_render.c",
+            "winsys/pvrsrvkm/pvr_srv_job_transfer.c",
+            "winsys/pvrsrvkm/pvr_srv_sync.c",
+            "winsys/pvrsrvkm/pvr_srv_sync_prim.c",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "_mesa_u_gralloc",
+            "blake3",
+            "compiler",
+            "libzstd",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+            "powervr_common",
+            "powervr_compiler",
+            "powervr_rogue",
+            "powervr_uscgen",
+            "pvr_pds",
+            "vtn",
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_util",
+            "vulkan_wsi",
+            "xmlconfig",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+        ],
+        (default, default): [],
+    }),
+    whole_static_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "powervr_rogue",
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_wsi",
+        ],
+        (default, default): [],
+    }),
+    target: {
+        android: {
+            relative_install_path: "hw",
+        },
+    },
+}

@@ -1,0 +1,225 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+genrule {
+    name: "cdm.h",
+    out: [
+        "src/imagination/csbgen/rogue/cdm.h",
+    ],
+    srcs: [
+        "cdm.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location cdm.xml) > " +
+        "$(location src/imagination/csbgen/rogue/cdm.h)",
+}
+
+genrule {
+    name: "cr.h",
+    out: [
+        "src/imagination/csbgen/rogue/cr.h",
+    ],
+    srcs: [
+        "cr.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location cr.xml) > $(location " +
+        "src/imagination/csbgen/rogue/cr.h)",
+}
+
+genrule {
+    name: "ipf.h",
+    out: [
+        "src/imagination/csbgen/rogue/ipf.h",
+    ],
+    srcs: [
+        "ipf.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location ipf.xml) > " +
+        "$(location src/imagination/csbgen/rogue/ipf.h)",
+}
+
+genrule {
+    name: "kmd_stream.h",
+    out: [
+        "src/imagination/csbgen/rogue/kmd_stream.h",
+    ],
+    srcs: [
+        "kmd_stream.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location kmd_stream.xml) > " +
+        "$(location src/imagination/csbgen/rogue/kmd_stream.h)",
+}
+
+genrule {
+    name: "lls.h",
+    out: [
+        "src/imagination/csbgen/rogue/lls.h",
+    ],
+    srcs: [
+        "lls.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location lls.xml) > " +
+        "$(location src/imagination/csbgen/rogue/lls.h)",
+}
+
+genrule {
+    name: "pbestate.h",
+    out: [
+        "src/imagination/csbgen/rogue/pbestate.h",
+    ],
+    srcs: [
+        "pbestate.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location pbestate.xml) > " +
+        "$(location src/imagination/csbgen/rogue/pbestate.h)",
+}
+
+genrule {
+    name: "pds.h",
+    out: [
+        "src/imagination/csbgen/rogue/pds.h",
+    ],
+    srcs: [
+        "pds.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location pds.xml) > " +
+        "$(location src/imagination/csbgen/rogue/pds.h)",
+}
+
+genrule {
+    name: "ppp.h",
+    out: [
+        "src/imagination/csbgen/rogue/ppp.h",
+    ],
+    srcs: [
+        "ppp.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location ppp.xml) > $(location " +
+        "src/imagination/csbgen/rogue/ppp.h)",
+}
+
+genrule {
+    name: "texstate.h",
+    out: [
+        "src/imagination/csbgen/rogue/texstate.h",
+    ],
+    srcs: [
+        "texstate.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location texstate.xml) > " +
+        "$(location src/imagination/csbgen/rogue/texstate.h)",
+}
+
+genrule {
+    name: "vdm.h",
+    out: [
+        "src/imagination/csbgen/rogue/vdm.h",
+    ],
+    srcs: [
+        "vdm.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/rogue",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location vdm.xml) > $(location " +
+        "src/imagination/csbgen/rogue/vdm.h)",
+}

@@ -14,6 +14,20 @@ package {
     default_applicable_licenses: ["external_mesa3d_license"],
 }
 
+filegroup {
+    name: "nir_algebraic.py",
+    srcs: [
+        "nir_algebraic.py",
+    ],
+}
+
+filegroup {
+    name: "nir_opcodes.py",
+    srcs: [
+        "nir_opcodes.py",
+    ],
+}
+
 python_binary_host {
     name: "nir_builder_opcodes_h_py_binary",
     main: "nir_builder_opcodes_h.py",
