@@ -164,6 +164,7 @@ foreach arch : ['rogue']
     ],
     dependencies : [
       pvr_android_deps,
+      dep_csbgen,
       dep_libdrm,
       dep_valgrind,
       idep_nir_headers,
