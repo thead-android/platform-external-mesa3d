@@ -353,7 +353,7 @@ static inline bool pvr_dump_buffer_truncate(struct pvr_dump_buffer_ctx *ctx,
    return true;
 }
 
-static inline const void *restrict pvr_dump_buffer_peek(
+static inline const void *pvr_dump_buffer_peek(
    struct pvr_dump_buffer_ctx *const restrict ctx,
    const uint64_t nr_bytes)
 {
@@ -368,7 +368,7 @@ static inline const void *restrict pvr_dump_buffer_peek(
    return ctx->ptr;
 }
 
-static inline const void *restrict pvr_dump_buffer_take(
+static inline const void *pvr_dump_buffer_take(
    struct pvr_dump_buffer_ctx *const restrict ctx,
    const uint64_t nr_bytes)
 {
