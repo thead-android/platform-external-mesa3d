@@ -30,7 +30,7 @@ cc_library_static {
     vendor: true,
     c_std: "c11",
     defaults: [
-        "_trial_msvc",
+        "lpi4a_imagination_c_args",
         "aosp_mesa3d_c_link_args",
         "aosp_mesa3d_c_project_args",
         "no_override_init_args",

@@ -22,6 +22,8 @@ with tempfile.TemporaryDirectory(prefix='lpi4a-mesa-soong-') as temporary:
         if str(relative).startswith(('src/asahi/', 'src/gallium/drivers/asahi/')):
             raise RuntimeError(str(relative))
         content = file.read_text()
+        if str(relative).startswith('src/imagination/'):
+            content = content.replace('"_trial_msvc"', '"lpi4a_imagination_c_args"')
         if relative == Path('Android.bp'):
             for name in ('aosp_mesa3d_c_project_args', 'aosp_mesa3d_cpp_project_args'):
                 token = '    name: "' + name + '",\n'

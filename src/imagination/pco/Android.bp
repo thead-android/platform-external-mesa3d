@@ -276,7 +276,7 @@ cc_library_static {
     c_std: "c11",
     cpp_std: "c++17",
     defaults: [
-        "_trial_msvc",
+        "lpi4a_imagination_c_args",
         "aosp_mesa3d_c_link_args",
         "aosp_mesa3d_c_project_args",
         "aosp_mesa3d_cpp_link_args",

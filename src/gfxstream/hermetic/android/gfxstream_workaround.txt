@@ -120,6 +120,13 @@ cc_library_headers {
     ],
 }
 
+cc_defaults {
+    name: "lpi4a_imagination_c_args",
+    vendor: true,
+    host_supported: true,
+    cflags: ["-Werror=pointer-arith"],
+}
+
 cc_library_static {
     name: "mesa_platform_virtgpu",
     vendor: true,
