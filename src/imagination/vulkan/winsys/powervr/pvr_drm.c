@@ -94,6 +94,10 @@ static void pvr_drm_winsys_destroy(struct pvr_winsys *ws)
              &destroy_vm_context_args,
              VK_ERROR_UNKNOWN);
 
+   if (drm_ws->null_job_syncobj)
+      drmSyncobjDestroy(ws->render_fd, drm_ws->null_job_syncobj);
+   simple_mtx_destroy(&drm_ws->null_job_sync_mutex);
+
    util_sparse_array_finish(&drm_ws->bo_map);
    u_rwlock_destroy(&drm_ws->dmabuf_bo_lock);
 
@@ -697,6 +701,8 @@ VkResult pvr_drm_winsys_create(const int render_fd,
       goto err_vk_free_drm_ws;
    }
 
+   simple_mtx_init(&drm_ws->null_job_sync_mutex, mtx_plain);
+
    util_sparse_array_init(&drm_ws->bo_map,
                           sizeof(struct pvr_drm_winsys_bo),
                           512);
@@ -760,6 +766,9 @@ err_pvr_destroy_vm_context:
 
 err_util_sparse_array_finish_bo_map:
    util_sparse_array_finish(&drm_ws->bo_map);
+   if (drm_ws->null_job_syncobj)
+      drmSyncobjDestroy(render_fd, drm_ws->null_job_syncobj);
+   simple_mtx_destroy(&drm_ws->null_job_sync_mutex);
    u_rwlock_destroy(&drm_ws->dmabuf_bo_lock);
 
 err_vk_free_drm_ws:

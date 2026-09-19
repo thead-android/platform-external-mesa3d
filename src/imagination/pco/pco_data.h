@@ -125,6 +125,9 @@ typedef struct _pco_fs_data {
    struct {
       bool color_write_enable;
    } meta_present;
+   /* Fixed single sample with enabled sample zero and no alpha-to-coverage/one.
+    * Explicit shader masks, discards, depth and memory side effects still apply. */
+   bool trivial_static_msaa;
 } pco_fs_data;
 
 /** PCO compute shader-specific data. */

@@ -529,6 +529,47 @@ pvr_cmd_buffer_upload_pds_data(struct pvr_cmd_buffer *const cmd_buffer,
                                          pds_upload_out);
 }
 
+static bool pvr_eot_program_cache_entry_matches(
+   const struct pvr_eot_program_cache_entry *entry,
+   const struct pvr_eot_props *props)
+{
+   STATIC_ASSERT(ROGUE_NUM_PBESTATE_STATE_WORDS ==
+                 ARRAY_SIZE(entry->state_words[0]));
+
+   return entry->emit_count == props->emit_count &&
+          entry->msaa_samples == props->msaa_samples &&
+          entry->num_output_regs == props->num_output_regs &&
+          memcmp(entry->state_words,
+                 props->state_words,
+                 props->emit_count * ROGUE_NUM_PBESTATE_STATE_WORDS *
+                    sizeof(uint32_t)) == 0 &&
+          memcmp(entry->tile_buffer_addrs,
+                 props->tile_buffer_addrs,
+                 sizeof(entry->tile_buffer_addrs)) == 0;
+}
+
+static void pvr_eot_program_cache_entry_init(
+   struct pvr_eot_program_cache_entry *entry,
+   const struct pvr_eot_props *props,
+   uint32_t usc_temp_count,
+   struct pvr_suballoc_bo *usc_program,
+   const struct pvr_pds_upload *pds_pixel_event_program)
+{
+   entry->emit_count = props->emit_count;
+   memcpy(entry->state_words,
+          props->state_words,
+          props->emit_count * ROGUE_NUM_PBESTATE_STATE_WORDS *
+             sizeof(uint32_t));
+   entry->msaa_samples = props->msaa_samples;
+   entry->num_output_regs = props->num_output_regs;
+   memcpy(entry->tile_buffer_addrs,
+          props->tile_buffer_addrs,
+          sizeof(entry->tile_buffer_addrs));
+   entry->usc_temp_count = usc_temp_count;
+   entry->usc_program = usc_program;
+   entry->pds_pixel_event_program = *pds_pixel_event_program;
+}
+
 /* pbe_cs_words must be an array of length emit_count with
  * ROGUE_NUM_PBESTATE_STATE_WORDS entries
  */
@@ -540,6 +581,8 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
    unsigned pixel_output_width,
    struct pvr_pds_upload *const pds_upload_out)
 {
+   assert(emit_count > 0 && emit_count <= PVR_MAX_COLOR_ATTACHMENTS);
+
    struct pvr_pds_event_program pixel_event_program = {
       /* No data to DMA, just a DOUTU needed. */
       .num_emit_word_pairs = 0,
@@ -582,6 +625,19 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
          props.msaa_samples = 1;
    }
 
+   simple_mtx_lock(&device->eot_program_cache_mtx);
+
+   for (uint32_t i = 0; i < device->eot_program_cache_count; i++) {
+      const struct pvr_eot_program_cache_entry *entry =
+         &device->eot_program_cache[i];
+
+      if (pvr_eot_program_cache_entry_matches(entry, &props)) {
+         *pds_upload_out = entry->pds_pixel_event_program;
+         simple_mtx_unlock(&device->eot_program_cache_mtx);
+         return VK_SUCCESS;
+      }
+   }
+
    eot =
       pvr_usc_eot(device->pdevice->pco_ctx, &props, &device->pdevice->dev_info);
    usc_temp_count = pco_shader_data(eot)->common.temps;
@@ -594,8 +650,10 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
 
    ralloc_free(eot);
 
-   if (result != VK_SUCCESS)
+   if (result != VK_SUCCESS) {
+      simple_mtx_unlock(&device->eot_program_cache_mtx);
       return result;
+   }
 
    pvr_pds_setup_doutu(&pixel_event_program.task_control,
                        usc_eot_program->dev_addr.addr,
@@ -632,11 +690,29 @@ static VkResult pvr_sub_cmd_gfx_per_job_fragment_programs_create_and_upload(
 
    vk_free(allocator, staging_buffer);
 
+   if (result == VK_SUCCESS &&
+       device->eot_program_cache_count < PVR_EOT_PROGRAM_CACHE_SIZE) {
+      struct pvr_eot_program_cache_entry *entry =
+         &device->eot_program_cache[device->eot_program_cache_count++];
+
+      /* Cache entries own these allocations until device destruction. */
+      list_del(&usc_eot_program->link);
+      list_del(&pds_upload_out->pvr_bo->link);
+      pvr_eot_program_cache_entry_init(entry,
+                                       &props,
+                                       usc_temp_count,
+                                       usc_eot_program,
+                                       pds_upload_out);
+   }
+
+   simple_mtx_unlock(&device->eot_program_cache_mtx);
+
    return result;
 
 err_free_usc_pixel_program:
    list_del(&usc_eot_program->link);
    pvr_bo_suballoc_free(usc_eot_program);
+   simple_mtx_unlock(&device->eot_program_cache_mtx);
 
    return result;
 }

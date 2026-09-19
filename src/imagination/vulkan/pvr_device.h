@@ -51,6 +51,20 @@ struct pvr_compute_query_shader {
    struct pvr_pds_upload pds_sec_code;
 };
 
+#define PVR_EOT_PROGRAM_CACHE_SIZE 32U
+
+struct pvr_eot_program_cache_entry {
+   unsigned emit_count;
+   uint32_t state_words[PVR_MAX_COLOR_ATTACHMENTS][2];
+   unsigned msaa_samples;
+   unsigned num_output_regs;
+   uint64_t tile_buffer_addrs[PVR_MAX_COLOR_ATTACHMENTS];
+
+   uint32_t usc_temp_count;
+   struct pvr_suballoc_bo *usc_program;
+   struct pvr_pds_upload pds_pixel_event_program;
+};
+
 struct pvr_device {
    struct vk_device vk;
    struct pvr_instance *instance;
@@ -148,6 +162,11 @@ struct pvr_device {
    } null_state;
 
    struct pvr_border_color_table *border_color_table;
+
+   simple_mtx_t eot_program_cache_mtx;
+   uint32_t eot_program_cache_count;
+   struct pvr_eot_program_cache_entry
+      eot_program_cache[PVR_EOT_PROGRAM_CACHE_SIZE];
 
    simple_mtx_t rs_mtx;
    struct list_head render_states;

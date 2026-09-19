@@ -498,11 +498,14 @@ static bool lower_sample_mask_out(nir_builder *b, nir_intrinsic_instr *intr, UNU
    return true;
 }
 
-bool pco_nir_lower_sample_mask_out(nir_shader *shader)
+bool pco_nir_lower_sample_mask_out(nir_shader *shader, const pco_fs_data *fs)
 {
    bool progress = nir_shader_intrinsics_pass(shader, lower_sample_mask_out, nir_metadata_control_flow, NULL);
    if (progress)
       return true;
+
+   if (fs->trivial_static_msaa)
+      return false;
 
    /* If the sample check isn't present, then add one ourselves. */
    nir_builder b = nir_builder_at(
@@ -511,6 +514,31 @@ bool pco_nir_lower_sample_mask_out(nir_shader *shader)
    insert_sample_check(&b, NULL);
 
    return true;
+}
+
+static bool pco_has_discard_or_terminate(nir_shader *shader)
+{
+   nir_foreach_function_impl(impl, shader) {
+      nir_foreach_block(block, impl) {
+         nir_foreach_instr(instr, block) {
+            if (instr->type == nir_instr_type_jump &&
+                nir_instr_as_jump(instr)->type == nir_jump_halt)
+               return true;
+            if (instr->type != nir_instr_type_intrinsic)
+               continue;
+            switch (nir_instr_as_intrinsic(instr)->intrinsic) {
+            case nir_intrinsic_demote:
+            case nir_intrinsic_demote_if:
+            case nir_intrinsic_demote_samples:
+            case nir_intrinsic_terminate_if:
+               return true;
+            default:
+               break;
+            }
+         }
+      }
+   }
+   return false;
 }
 
 static bool lower_isp_fb(nir_builder *b, struct pfo_state *state)
@@ -553,6 +581,12 @@ static bool lower_isp_fb(nir_builder *b, struct pfo_state *state)
    nir_def *undef = nir_undef(b, 1, 32);
 
    nir_def *discard_cond = nir_is_helper_invocation(b, 1);
+
+   /* Preserve all newer helper-invocation/memory semantics. Only elide empty
+    * feedback for the proven fixed-1x, no-depth/no-side-effect case. */
+   if (state->fs->trivial_static_msaa && !state->depth_feedback_src &&
+       !shader->info.writes_memory && !pco_has_discard_or_terminate(shader))
+      discard_cond = NULL;
 
    /* Drop depth writes and discard cond if early fragment tests. */
    if (shader->info.fs.early_fragment_tests) {
@@ -813,7 +847,7 @@ bool pco_nir_pfo(nir_shader *shader, pco_fs_data *fs)
    /* TODO: instead of doing multiple passes, probably better to just cache all
     * the stores
     */
-   if (!shader->info.internal) {
+   if (!shader->info.internal && !fs->trivial_static_msaa) {
       progress |= nir_shader_intrinsics_pass(shader,
                                              lower_alpha_to_one,
                                              nir_metadata_control_flow,

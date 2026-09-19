@@ -1036,7 +1036,7 @@ void pco_lower_nir(pco_ctx *ctx, nir_shader *nir, pco_data *data)
    NIR_PASS(_, nir, pco_nir_lower_tex, data, ctx);
 
    if (nir->info.stage == MESA_SHADER_FRAGMENT) {
-      if (!internal)
+      if (!internal && !data->fs.trivial_static_msaa)
          NIR_PASS(_, nir, pco_nir_lower_alpha_to_coverage);
 
       NIR_PASS(_, nir, nir_lower_blend, &data->fs.blend_opts);
@@ -1048,7 +1048,7 @@ void pco_lower_nir(pco_ctx *ctx, nir_shader *nir, pco_data *data)
       NIR_PASS(_, nir, nir_opt_peephole_select, &peep_opts);
       NIR_PASS(_, nir, pco_nir_lower_interpolation, &data->fs);
       if (!internal)
-         NIR_PASS(_, nir, pco_nir_lower_sample_mask_out);
+         NIR_PASS(_, nir, pco_nir_lower_sample_mask_out, &data->fs);
       NIR_PASS(_, nir, pco_nir_pfo, &data->fs);
       NIR_PASS(_, nir, nir_lower_is_helper_invocation);
       NIR_PASS(_, nir, pco_nir_lower_fs_intrinsics);

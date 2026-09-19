@@ -43,16 +43,40 @@ VkResult pvr_drm_winsys_null_job_submit(struct pvr_winsys *ws,
                                         uint32_t wait_count,
                                         struct vk_sync_signal *signal_sync)
 {
-   const struct pvr_drm_winsys *drm_ws = to_pvr_drm_winsys(ws);
-   uint32_t tmp_syncobj;
+   struct pvr_drm_winsys *drm_ws = to_pvr_drm_winsys(ws);
+   const int render_fd = drm_ws->base.render_fd;
    VkResult result;
    int ret;
+
+   if (wait_count == 0) {
+      uint32_t dst_syncobj =
+         vk_sync_as_drm_syncobj(signal_sync->sync)->syncobj;
+
+      if (signal_sync->signal_value) {
+         ret = drmSyncobjTimelineSignal(render_fd,
+                                        &dst_syncobj,
+                                        &signal_sync->signal_value,
+                                        1);
+      } else {
+         ret = drmSyncobjSignal(render_fd, &dst_syncobj, 1);
+      }
+
+      if (ret) {
+         return vk_errorf(NULL,
+                          VK_ERROR_OUT_OF_DEVICE_MEMORY,
+                          "Failed to signal null job syncobj. Errno: %d - %s.",
+                          errno,
+                          strerror(errno));
+      }
+
+      return VK_SUCCESS;
+   }
 
    if (wait_count == 1) {
       struct vk_sync *src_sync = waits[0].sync;
       struct vk_sync *dst_sync = signal_sync->sync;
 
-      ret = drmSyncobjTransfer(drm_ws->base.render_fd,
+      ret = drmSyncobjTransfer(render_fd,
                                vk_sync_as_drm_syncobj(dst_sync)->syncobj,
                                signal_sync->signal_value,
                                vk_sync_as_drm_syncobj(src_sync)->syncobj,
@@ -69,15 +93,28 @@ VkResult pvr_drm_winsys_null_job_submit(struct pvr_winsys *ws,
       return VK_SUCCESS;
    }
 
-   ret = drmSyncobjCreate(drm_ws->base.render_fd,
-                          wait_count == 0 ? DRM_SYNCOBJ_CREATE_SIGNALED : 0,
-                          &tmp_syncobj);
-   if (ret) {
-      return vk_errorf(NULL,
-                       VK_ERROR_OUT_OF_DEVICE_MEMORY,
-                       "Failed to create temporary syncobj. Errno: %d - %s.",
-                       errno,
-                       strerror(errno));
+   simple_mtx_lock(&drm_ws->null_job_sync_mutex);
+
+   if (!drm_ws->null_job_syncobj) {
+      ret = drmSyncobjCreate(render_fd, 0, &drm_ws->null_job_syncobj);
+      if (ret) {
+         result = vk_errorf(NULL,
+                            VK_ERROR_OUT_OF_DEVICE_MEMORY,
+                            "Failed to create null job syncobj. Errno: %d - %s.",
+                            errno,
+                            strerror(errno));
+         goto out_unlock;
+      }
+   } else {
+      ret = drmSyncobjReset(render_fd, &drm_ws->null_job_syncobj, 1);
+      if (ret) {
+         result = vk_errorf(NULL,
+                            VK_ERROR_OUT_OF_DEVICE_MEMORY,
+                            "Failed to reset null job syncobj. Errno: %d - %s.",
+                            errno,
+                            strerror(errno));
+         goto out_discard_syncobj;
+      }
    }
 
    for (uint32_t i = 0; i < wait_count; i++) {
@@ -86,8 +123,8 @@ VkResult pvr_drm_winsys_null_job_submit(struct pvr_winsys *ws,
       if (!src_sync)
          continue;
 
-      ret = drmSyncobjTransfer(drm_ws->base.render_fd,
-                               tmp_syncobj,
+      ret = drmSyncobjTransfer(render_fd,
+                               drm_ws->null_job_syncobj,
                                i + 1,
                                vk_sync_as_drm_syncobj(src_sync)->syncobj,
                                waits[i].wait_value,
@@ -99,14 +136,14 @@ VkResult pvr_drm_winsys_null_job_submit(struct pvr_winsys *ws,
                       "Failed to create temporary syncobj. Errno: %d - %s.",
                       errno,
                       strerror(errno));
-         goto out_destroy_tmp_syncobj;
+         goto out_discard_syncobj;
       }
    }
 
-   ret = drmSyncobjTransfer(drm_ws->base.render_fd,
+   ret = drmSyncobjTransfer(render_fd,
                             vk_sync_as_drm_syncobj(signal_sync->sync)->syncobj,
                             signal_sync->signal_value,
-                            tmp_syncobj,
+                            drm_ws->null_job_syncobj,
                             wait_count,
                             0);
    if (ret) {
@@ -119,7 +156,13 @@ VkResult pvr_drm_winsys_null_job_submit(struct pvr_winsys *ws,
       result = VK_SUCCESS;
    }
 
-out_destroy_tmp_syncobj:
-   drmSyncobjDestroy(drm_ws->base.render_fd, tmp_syncobj);
+   goto out_unlock;
+
+out_discard_syncobj:
+   drmSyncobjDestroy(render_fd, drm_ws->null_job_syncobj);
+   drm_ws->null_job_syncobj = 0;
+
+out_unlock:
+   simple_mtx_unlock(&drm_ws->null_job_sync_mutex);
    return result;
 }

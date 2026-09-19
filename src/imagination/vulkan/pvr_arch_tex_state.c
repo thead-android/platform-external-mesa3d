@@ -187,8 +187,14 @@ VkResult pvr_arch_pack_tex_state(struct pvr_device *device,
        * The driver must select the correct single aspect format when sampling
        * to avoid this.
        */
-      word0.texformat =
+      uint32_t texformat =
          pvr_arch_get_tex_format_aspect(info->format, info->aspect_mask);
+
+      /* BayLibre Android port: never pack the all-ones unsupported-format
+       * sentinel into the hardware's seven-bit texture format field. */
+      if (texformat == ROGUE_TEXSTATE_FORMAT_INVALID)
+         return vk_error(device, VK_ERROR_FORMAT_NOT_SUPPORTED);
+      word0.texformat = texformat;
 
       if (info->swap_chroma) {
          word0.texformat = pvr_chroma_swap_format(word0.texformat);

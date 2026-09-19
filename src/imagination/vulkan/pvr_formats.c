@@ -53,6 +53,7 @@
 #include "vk_format.h"
 #include "vk_log.h"
 #include "vk_util.h"
+#include "vk_android.h"
 
 uint32_t pvr_get_pbe_accum_format_size_in_bytes(VkFormat vk_format)
 {
@@ -857,6 +858,12 @@ VkResult pvr_GetPhysicalDeviceImageFormatProperties2(
     */
    if (external_info && external_info->handleType != 0) {
       switch (external_info->handleType) {
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      case VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID:
+         return vk_android_get_ahb_image_properties(physicalDevice,
+                                                   pImageFormatInfo,
+                                                   pImageFormatProperties);
+#endif
       case VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT:
       case VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT:
          if (!external_props)
@@ -922,6 +929,17 @@ void pvr_GetPhysicalDeviceExternalBufferProperties(
       goto unsupported;
 
    switch (pExternalBufferInfo->handleType) {
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+   case VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID:
+      pExternalBufferProperties->externalMemoryProperties =
+         (VkExternalMemoryProperties){
+            .externalMemoryFeatures = VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT |
+                                      VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT,
+            .compatibleHandleTypes = pExternalBufferInfo->handleType,
+            .exportFromImportedHandleTypes = pExternalBufferInfo->handleType,
+         };
+      return;
+#endif
    case VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT:
    case VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT:
       /* clang-format off */

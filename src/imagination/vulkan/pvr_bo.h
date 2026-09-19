@@ -59,6 +59,14 @@ struct pvr_bo {
    uint32_t ref_count;
 };
 
+/*
+ * Command buffers can keep several generations of upload BOs alive at once.
+ * Keeping only one retired BO causes the remaining BOs released by a command
+ * pool reset to be destroyed and recreated on the next frame.  A small,
+ * bounded cache avoids that GEM/VMA churn without retaining unbounded memory.
+ */
+#define PVR_SUBALLOCATOR_CACHE_SIZE 8
+
 struct pvr_suballocator {
    /* Pointer to the pvr_device this allocator is associated with */
    struct pvr_device *device;
@@ -72,8 +80,9 @@ struct pvr_suballocator {
 
    /* Current buffer object where sub-allocations are made from */
    struct pvr_bo *bo;
-   /* Previous buffer that can be used when a new buffer object is needed */
-   struct pvr_bo *bo_cached;
+   /* Retired buffers that can be reused when a new buffer object is needed */
+   struct pvr_bo *bo_cached[PVR_SUBALLOCATOR_CACHE_SIZE];
+   uint32_t bo_cached_count;
    /* Track from where to start the next sub-allocation */
    uint32_t next_offset;
 };

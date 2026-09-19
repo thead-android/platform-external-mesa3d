@@ -63,6 +63,11 @@ pvr_includes = [
   libpowervr_pds_includes,
 ]
 
+pvr_android_deps = []
+if with_platform_android
+  pvr_android_deps += dep_android
+endif
+
 pvr_deps = [
   dep_csbgen,
   dep_libdrm,
@@ -158,6 +163,8 @@ foreach arch : ['rogue']
       inc_src,
     ],
     dependencies : [
+      pvr_android_deps,
+      dep_libdrm,
       dep_valgrind,
       idep_nir_headers,
       idep_pco_uscgen_programs_headers,

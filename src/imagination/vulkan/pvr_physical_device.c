@@ -204,6 +204,10 @@ static void pvr_physical_device_get_supported_extensions(
       .EXT_extended_dynamic_state2 = true,
       .EXT_extended_dynamic_state3 = true,
       .EXT_external_memory_dma_buf = true,
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+      .ANDROID_external_memory_android_hardware_buffer = true,
+      .ANDROID_native_buffer = true,
+#endif
       .EXT_host_query_reset = true,
       .EXT_image_2d_view_of_3d = true,
       .EXT_index_type_uint8 = true,

@@ -31,6 +31,7 @@
 #include "pvr_winsys.h"
 #include "util/macros.h"
 #include "util/rwlock.h"
+#include "util/simple_mtx.h"
 #include "util/sparse_array.h"
 
 struct pvr_drm_winsys_heap {
@@ -47,6 +48,15 @@ struct pvr_drm_winsys {
     * below.
     */
    struct u_rwlock dmabuf_bo_lock;
+
+   /*
+    * Null jobs merge multiple waits through a temporary timeline syncobj.
+    * Keep one per winsys and reset it between submissions: transferring its
+    * fence to the destination retains the fence reference, so recreating the
+    * kernel object for every null job only adds ioctl and allocation churn.
+    */
+   simple_mtx_t null_job_sync_mutex;
+   uint32_t null_job_syncobj;
 
    /* This array holds all our 'struct pvr_drm_winsys_bo' allocations. We use
     * this so we can add a refcount to our BOs and check if a particular BO was
