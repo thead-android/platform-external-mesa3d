@@ -22,16 +22,12 @@ license {
         "SPDX-license-identifier-Apache-2.0",
         "SPDX-license-identifier-GPL-1.0-or-later",
         "SPDX-license-identifier-GPL-2.0-only",
-        "SPDX-license-identifier-BSL-1.0",
-        "SPDX-license-identifier-SGI-B-2.0",
     ],
     license_text: [
         "licenses/MIT",
         "licenses/Apache-2.0",
         "licenses/GPL-1.0-or-later",
         "licenses/GPL-2.0-only",
-        "licenses/BSL-1.0",
-        "licenses/SGI-B-2.0",
     ],
 }
 
