@@ -90,6 +90,7 @@ common_per_arch_files = [
   pvr_drirc[1],
   sha1_h,
   shader_stats_h,
+  pco_common_h,
 ]
 
 common_per_arch_files += files(
@@ -183,7 +184,7 @@ endforeach
 
 libvulkan_powervr_mesa = shared_library(
   'vulkan_powervr_mesa',
-  [pvr_files, pvr_entrypoints, pvr_drirc, u_format_pack_h],
+  [pvr_files, pvr_entrypoints, pvr_drirc, u_format_pack_h, sha1_h, pco_common_h],
   include_directories : [
     pvr_includes,
     inc_imagination,
