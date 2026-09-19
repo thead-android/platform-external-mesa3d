@@ -8,8 +8,8 @@ handwritten_modules = 'gfxstream_workaround.txt'
 
 [copyright]
 license_name = "external_mesa3d_license"
-licenses = ["MIT", "Apache-2.0", "GPL-1.0-or-later", "GPL-2.0-only"]
-license_texts = ["LICENSE"]
+licenses = ["MIT", "Apache-2.0", "GPL-1.0-or-later", "GPL-2.0-only", "BSL-1.0", "SGI-B-2.0"]
+license_texts = ["licenses/MIT", "licenses/Apache-2.0", "licenses/GPL-1.0-or-later", "licenses/GPL-2.0-only", "licenses/BSL-1.0", "licenses/SGI-B-2.0"]
 
 [target_renames]
 vulkan_lvp = "vulkan.lvp"
