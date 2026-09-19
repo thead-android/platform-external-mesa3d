@@ -233,6 +233,7 @@ cc_library_static {
         "pvr_volcanic_pbestate.h",
         "pvr_volcanic_pds.h",
         "pvr_volcanic_texstate.h",
+        "shader_stats.h",
         "spirv_info_headers",
         "u_format_gen.h",
         "vk_cmd_enqueue_entrypoints_headers",

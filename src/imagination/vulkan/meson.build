@@ -89,6 +89,7 @@ common_per_arch_files = [
   pvr_entrypoints[0],
   pvr_drirc[1],
   sha1_h,
+  shader_stats_h,
 ]
 
 common_per_arch_files += files(
