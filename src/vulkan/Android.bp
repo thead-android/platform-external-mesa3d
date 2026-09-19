@@ -1,0 +1,66 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+genrule {
+    name: "vulkan_api.def",
+    out: [
+        "vulkan_api.def",
+    ],
+    srcs: [
+        "vulkan_api.def.in",
+    ],
+    tools: [
+        "gen_vs_module_defs_py_binary",
+    ],
+    cmd: "$(location gen_vs_module_defs_py_binary) --in_file $(location " +
+        "vulkan_api.def.in) --out_file $(location vulkan_api.def) " +
+        "--compiler_abi other --compiler_id clang --cpu_family riscv64",
+}
+
+cc_defaults {
+    name: "vulkan_wsi_list",
+    vendor: true,
+    host_supported: true,
+    cflags: select(os(), {
+        "android": [
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("x86_64", "linux_glibc"): [
+            "-DVK_USE_PLATFORM_DISPLAY_KHR",
+        ],
+        ("x86_64", "linux_musl"): [
+            "-DVK_USE_PLATFORM_DISPLAY_KHR",
+        ],
+        ("arm64", "linux_musl"): [
+            "-DVK_USE_PLATFORM_DISPLAY_KHR",
+        ],
+        (default, default): [],
+    }),
+    cppflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        ("x86_64", "android"): [
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        ("x86", "android"): [
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        (default, default): [],
+    }),
+}

@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+rust_library {
+    name: "libmagma_gpu",
+    vendor: true,
+    edition: "2021",
+    crate_root: "lib.rs",
+    crate_name: "magma_gpu",
+    host_supported: true,
+    defaults: [
+        "rust_global_args",
+    ],
+    rustlibs: select(arch(), {
+        "arm64": [
+            "libcfg_if",
+            "liblog_rust",
+            "librustix",
+            "libthiserror",
+            "libzerocopy",
+        ],
+        "x86_64": [
+            "libcfg_if",
+            "liblog_rust",
+            "librustix",
+            "libthiserror",
+            "libzerocopy",
+        ],
+        "x86": [
+            "libcfg_if",
+            "liblog_rust",
+            "librustix",
+            "libthiserror",
+            "libzerocopy",
+        ],
+        default: [],
+    }),
+    proc_macros: [
+        "libremain",
+    ],
+}

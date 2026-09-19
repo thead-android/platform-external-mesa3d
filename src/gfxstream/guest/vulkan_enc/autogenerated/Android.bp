@@ -1,0 +1,29 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_lib_vulkan_enc_1",
+    srcs: [
+        "VkEncoder.cpp",
+        "func_table.cpp",
+        "goldfish_vk_counting_guest.cpp",
+        "goldfish_vk_deepcopy_guest.cpp",
+        "goldfish_vk_extension_structs_guest.cpp",
+        "goldfish_vk_marshaling_guest.cpp",
+        "goldfish_vk_reserved_marshaling_guest.cpp",
+        "goldfish_vk_transform_guest.cpp",
+    ],
+}

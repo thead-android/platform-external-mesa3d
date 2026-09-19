@@ -1,6 +1,73 @@
 # Copyright 2026 The Magma GPU Project
 # SPDX-License-Identifier: MIT
 
+[[platform]]
+name = "android_riscv64"
+
+[platform.machine_info]
+cpu_family = "riscv64"
+cpu = "riscv64"
+system = "android"
+endian = "little"
+
+[platform.c]
+compiler_id = "clang"
+linker_id = "ld.lld"
+version = "22.0.0"
+
+[platform.c.check_header.fails]
+"pthread_np.h" = true
+"sys/sysctl.h" = true
+
+[platform.c.has_header_symbol.fails]
+"errno.h" = { program_invocation_name = true }
+"math.h" = { issignaling = true }
+"sys/mkdev.h" = { major = true }
+
+[platform.c.has_function.fails]
+__builtin_aarch64_get_fpcr = true
+__builtin_aarch64_set_fpcr = true
+__builtin_add_overflow_p = true
+__builtin_arm_get_fpscr = true
+__builtin_arm_set_fpscr = true
+__builtin_ia32_clflushopt = true
+__builtin_sub_overflow_p = true
+pthread_setaffinity_np = true
+qsort_s = true
+random_r = true
+secure_getenv = true
+
+[platform.c.has_function_attribute.fails]
+"optimize" = true
+
+[platform.c.supported_arguments.fails]
+args = [
+    "-Wno-error=maybe-uninitialized", "-Wno-nonnull-compare",
+]
+
+[platform.c.sizeof.sizes]
+"void*" = 8
+
+[platform.cpp]
+compiler_id = "clang"
+linker_id = "ld.lld"
+version = "22.0.0"
+
+[platform.cpp.links.fails]
+"BSD qsort_r" = true
+"GNU qsort_r" = true
+
+[platform.cpp.supported_arguments.fails]
+args = [
+    "-Wno-class-memaccess", "-Wno-error=maybe-uninitialized",
+    "-flifetime-dse=1",
+]
+
+[platform.rust]
+compiler_id = "rustc"
+linker_id = "ld.lld"
+version = "1.90.0"
+
 # Generated via meson check-platforms --config=${PROJECT_DIR}/src/gfxstream/hermetic/android/aosp_mesa3d.toml --platforms=${PROJECT_DIR}/src/gfxstream/hermetic/android/platforms.toml --dependencies=${PROJECT_DIR}/src/gfxstream/hermetic/android/dependencies.toml --project-dir=${PROJECT_DIR}
 
 [[wrap]]

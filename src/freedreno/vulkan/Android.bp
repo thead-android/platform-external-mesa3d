@@ -1,0 +1,479 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+python_binary_host {
+    name: "tu_drirc_py_binary",
+    main: "tu_drirc_gen.py",
+    srcs: [
+        ":drirc_gen.py",
+        "tu_drirc_gen.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "tu_tracepoints_py_binary",
+    main: "tu_tracepoints.py",
+    srcs: [
+        ":u_trace_py",
+        "tu_tracepoints.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "float32_spv.h",
+    out: [
+        "src/freedreno/vulkan/float32_spv.h",
+    ],
+    srcs: [
+        ":float32_glsl_file",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/vulkan",
+    ],
+    cmd: "$(location glslangValidator) --no-link -V -S comp -x -o $(location " +
+        "src/freedreno/vulkan/float32_spv.h) $(location :float32_glsl_file) " +
+        "--quiet --depfile float32_spv.h.d",
+}
+
+genrule {
+    name: "float64_spv.h",
+    out: [
+        "src/freedreno/vulkan/float64_spv.h",
+    ],
+    srcs: [
+        ":float64_glsl_file",
+    ],
+    tools: [
+        "glsl2spirv_py_binary",
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/vulkan",
+    ],
+    cmd: "$(location glsl2spirv_py_binary) $(location :float64_glsl_file) " +
+        "$(location src/freedreno/vulkan/float64_spv.h) $(location " +
+        "glslangValidator) --vn float64_spv_source --glsl-version 450 -Olib " +
+        "--depfile float64_spv.h.d",
+}
+
+genrule {
+    name: "freedreno_devenv_icd",
+    out: [
+        "freedreno_devenv_icd.aarch64.json",
+    ],
+    srcs: [
+        ":vk_api_xml",
+    ],
+    tools: [
+        "vk_icd_py_binary",
+    ],
+    cmd: "$(location vk_icd_py_binary) --api-version 1.4 --xml $(location " +
+        ":vk_api_xml) --sizeof-pointer 8 --icd-lib-path $(genDir) " +
+        "--icd-filename libvulkan_freedreno.so --out $(location " +
+        "freedreno_devenv_icd.aarch64.json)",
+}
+
+genrule {
+    name: "tu_drirc_headers",
+    out: [
+        "src/freedreno/vulkan/tu_drirc.h",
+    ],
+    srcs: [
+        "00-turnip-defaults.conf",
+    ],
+    tools: [
+        "tu_drirc_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/vulkan",
+    ],
+    cmd: "$(location tu_drirc_py_binary) --import-path $(genDir)/src/util " +
+        "--drirc-src $(genDir)/src/freedreno/vulkan/tu_drirc.c --drirc-hdr " +
+        "$(location src/freedreno/vulkan/tu_drirc.h) --validate $(location " +
+        "00-turnip-defaults.conf)",
+}
+
+genrule {
+    name: "tu_drirc_impl",
+    out: [
+        "src/freedreno/vulkan/tu_drirc.c",
+    ],
+    srcs: [
+        "00-turnip-defaults.conf",
+    ],
+    tools: [
+        "tu_drirc_py_binary",
+    ],
+    cmd: "$(location tu_drirc_py_binary) --import-path $(genDir)/src/util " +
+        "--drirc-src $(location src/freedreno/vulkan/tu_drirc.c) --drirc-hdr " +
+        "$(genDir)/src/freedreno/vulkan/tu_drirc.h --validate $(location " +
+        "00-turnip-defaults.conf)",
+}
+
+genrule {
+    name: "tu_entrypoints_headers",
+    out: [
+        "src/freedreno/vulkan/tu_entrypoints.h",
+    ],
+    srcs: [
+        ":vk_api_xml",
+    ],
+    tools: [
+        "vk_entrypoints_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/vulkan",
+    ],
+    cmd: "$(location vk_entrypoints_py_binary) --xml $(location :vk_api_xml) " +
+        "--proto --weak --out-h $(location " +
+        "src/freedreno/vulkan/tu_entrypoints.h) --out-c " +
+        "$(genDir)/src/freedreno/vulkan/tu_entrypoints.cc --prefix tu --include " +
+        "adreno_common.xml.h --tmpl-prefix tu --tmpl-param 'chip CHIP' " +
+        "--tmpl-variants '<A6XX>' '<A7XX>' '<A8XX>' --beta false " +
+        "--device-prefix tu_rmv",
+}
+
+genrule {
+    name: "tu_entrypoints_impl",
+    out: [
+        "src/freedreno/vulkan/tu_entrypoints.cc",
+    ],
+    srcs: [
+        ":vk_api_xml",
+    ],
+    tools: [
+        "vk_entrypoints_py_binary",
+    ],
+    cmd: "$(location vk_entrypoints_py_binary) --xml $(location :vk_api_xml) " +
+        "--proto --weak --out-h $(genDir)/src/freedreno/vulkan/tu_entrypoints.h " +
+        "--out-c $(location src/freedreno/vulkan/tu_entrypoints.cc) --prefix tu " +
+        "--include adreno_common.xml.h --tmpl-prefix tu --tmpl-param 'chip " +
+        "CHIP' --tmpl-variants '<A6XX>' '<A7XX>' '<A8XX>' --beta false " +
+        "--device-prefix tu_rmv",
+}
+
+genrule {
+    name: "tu_tracepoints.ch_headers",
+    out: [
+        "src/freedreno/vulkan/tu_tracepoints.h",
+        "src/freedreno/vulkan/tu_tracepoints_perfetto.h",
+    ],
+    tools: [
+        "tu_tracepoints_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/vulkan",
+    ],
+    cmd: "$(location tu_tracepoints_py_binary) -p $(genDir)/src/util/perf/ " +
+        "--utrace-src $(genDir)/src/freedreno/vulkan/tu_tracepoints.cc " +
+        "--utrace-hdr $(location src/freedreno/vulkan/tu_tracepoints.h) " +
+        "--perfetto-hdr $(location " +
+        "src/freedreno/vulkan/tu_tracepoints_perfetto.h)",
+}
+
+genrule {
+    name: "tu_tracepoints.ch_impl",
+    out: [
+        "src/freedreno/vulkan/tu_tracepoints.cc",
+    ],
+    tools: [
+        "tu_tracepoints_py_binary",
+    ],
+    cmd: "$(location tu_tracepoints_py_binary) -p $(genDir)/src/util/perf/ " +
+        "--utrace-src $(location src/freedreno/vulkan/tu_tracepoints.cc) " +
+        "--utrace-hdr $(genDir)/src/freedreno/vulkan/tu_tracepoints.h " +
+        "--perfetto-hdr " +
+        "$(genDir)/src/freedreno/vulkan/tu_tracepoints_perfetto.h",
+}
+
+cc_defaults {
+    name: "tu_cpp_args",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-Wno-address-of-temporary",
+            "-Wno-c99-designator",
+            "-Wno-missing-braces",
+            "-Wno-pointer-arith",
+            "-Wno-reorder-init-list",
+            "-Wno-switch",
+            "-Wno-vla-cxx-extension",
+            "-Wno-writable-strings",
+            "-Wno-write-strings",
+            "-fno-exceptions",
+            "-fno-rtti",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "tu_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DTU_HAS_KGSL",
+            "-DTU_HAS_MSM",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "vulkan_freedreno_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "vulkan_freedreno_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_shared {
+    name: "vulkan.freedreno",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "_trial_c",
+        "_trial_soong_c",
+        "_trial_soong_cpp",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "computerator_cpp_args",
+        "ld_args_bsymbolic",
+        "ld_args_build_id",
+        "ld_args_gc_sections",
+        "no_override_init_args",
+        "tu_cpp_args",
+        "tu_flags",
+        "vulkan_freedreno_c_flags",
+        "vulkan_freedreno_cpp_flags",
+        "vulkan_wsi_list",
+    ],
+    header_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+            "inc_compiler",
+            "inc_freedreno",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_src_freedreno_vulkan_bvh",
+            "inc_src_vulkan_runtime",
+            "inc_src_vulkan_util",
+            "inc_src_vulkan_wsi",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "a2xx.xml.h",
+        "a2xx_perfcntrs.json.h",
+        "a3xx.xml.h",
+        "a4xx.xml.h",
+        "a5xx.xml.h",
+        "a5xx_perfcntrs.json.h",
+        "a6xx-pack.xml.h",
+        "a6xx.xml.h",
+        "a6xx_descriptors.xml.h",
+        "a6xx_enums.xml.h",
+        "a6xx_gmu.xml.h",
+        "a6xx_perfcntrs.json.h",
+        "a6xx_perfcntrs.xml.h",
+        "a7xx_enums.xml.h",
+        "a7xx_perfcntrs.json.h",
+        "a7xx_perfcntrs.xml.h",
+        "a8xx_descriptors.xml.h",
+        "a8xx_enums.xml.h",
+        "a8xx_perfcntrs.json.h",
+        "a8xx_perfcntrs.xml.h",
+        "adreno-pm4-pack.xml.h",
+        "adreno.xml.h",
+        "adreno_common.xml.h",
+        "adreno_control_regs.xml.h",
+        "adreno_pipe_regs.xml.h",
+        "adreno_pm4.xml.h",
+        "builtin_types.h",
+        "copy.spv.h",
+        "encode.spv.h",
+        "float32_spv.h",
+        "float64_spv.h",
+        "git_sha1.h",
+        "header.spv.h",
+        "ir_expression_operation.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "ocmem.xml.h",
+        "shader_stats.h",
+        "spirv_info_headers",
+        "tu_drirc_headers",
+        "tu_entrypoints_headers",
+        "tu_tracepoints.ch_headers",
+        "u_format_gen.h",
+        "u_format_pack.h",
+        "vk_cmd_enqueue_entrypoints_headers",
+        "vk_cmd_queue_headers",
+        "vk_common_entrypoints_headers",
+        "vk_dispatch_table_headers",
+        "vk_dispatch_trampolines_headers",
+        "vk_enum_to_str_headers",
+        "vk_extensions_headers",
+        "vk_format_info_headers",
+        "vk_physical_device_features_headers",
+        "vk_physical_device_properties_headers",
+        "vk_struct_type_cast",
+        "wsi_entrypoints_headers",
+    ],
+    srcs: select((arch(), os()), {
+        ("arm64", "android"): [
+            ":libtu_files",
+            ":tu_drirc_impl",
+            ":tu_entrypoints_impl",
+            ":tu_tracepoints.ch_impl",
+            "tu_acceleration_structure.cc",
+            "tu_autotune.cc",
+            "tu_buffer.cc",
+            "tu_buffer_view.cc",
+            "tu_clear_blit.cc",
+            "tu_cmd_buffer.cc",
+            "tu_cs.cc",
+            "tu_cs_breadcrumbs.cc",
+            "tu_descriptor_set.cc",
+            "tu_device.cc",
+            "tu_dynamic_rendering.cc",
+            "tu_event.cc",
+            "tu_formats.cc",
+            "tu_image.cc",
+            "tu_knl.cc",
+            "tu_knl_drm.cc",
+            "tu_knl_drm_msm.cc",
+            "tu_knl_kgsl.cc",
+            "tu_lrz.cc",
+            "tu_nir_lower_demote_samples.cc",
+            "tu_nir_lower_multiview.cc",
+            "tu_nir_lower_ray_query.cc",
+            "tu_pass.cc",
+            "tu_pipeline.cc",
+            "tu_query_pool.cc",
+            "tu_queue.cc",
+            "tu_rmv.cc",
+            "tu_sampler.cc",
+            "tu_shader.cc",
+            "tu_suballoc.cc",
+            "tu_subsampled_image.cc",
+            "tu_tile_config.cc",
+            "tu_util.cc",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "_mesa_u_gralloc",
+            "blake3",
+            "compiler",
+            "freedreno_common",
+            "freedreno_ir3",
+            "freedreno_layout",
+            "freedreno_perfcntrs",
+            "ir3decode",
+            "ir3encode",
+            "isaspec",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+            "vtn",
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_util",
+            "vulkan_wsi",
+            "xmlconfig",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libui",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+    whole_static_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_wsi",
+        ],
+        (default, default): [],
+    }),
+    target: {
+        android: {
+            relative_install_path: "hw",
+        },
+    },
+}

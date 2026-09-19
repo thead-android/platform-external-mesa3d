@@ -1,0 +1,92 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_libgallium_2",
+    srcs: [
+        "u_async_debug.c",
+        "u_bitmask.c",
+        "u_blitter.c",
+        "u_debug_describe.c",
+        "u_debug_flush.c",
+        "u_debug_image.c",
+        "u_debug_refcnt.c",
+        "u_draw.c",
+        "u_draw_quad.c",
+        "u_driconf.c",
+        "u_dump_defines.c",
+        "u_dump_state.c",
+        "u_framebuffer.c",
+        "u_gen_mipmap.c",
+        "u_handle_table.c",
+        "u_helpers.c",
+        "u_index_modify.c",
+        "u_live_shader_cache.c",
+        "u_log.c",
+        "u_prim.c",
+        "u_prim_restart.c",
+        "u_pstipple.c",
+        "u_resource.c",
+        "u_sample_positions.c",
+        "u_sampler.c",
+        "u_screen.c",
+        "u_simple_shaders.c",
+        "u_split_draw.c",
+        "u_suballoc.c",
+        "u_surface.c",
+        "u_tests.c",
+        "u_texture.c",
+        "u_threaded_context.c",
+        "u_tile.c",
+        "u_trace_gallium.c",
+        "u_transfer.c",
+        "u_transfer_helper.c",
+        "u_upload_mgr.c",
+        "u_vbuf.c",
+        "u_vertex_state_cache.c",
+    ],
+}
+
+python_binary_host {
+    name: "u_tracepoints_py_binary",
+    main: "u_tracepoints.py",
+    srcs: [
+        ":u_trace_py",
+        "u_tracepoints.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+cc_library_headers {
+    name: "inc_src_gallium_auxiliary_util",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}

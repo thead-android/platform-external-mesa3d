@@ -1,0 +1,954 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+license {
+    name: "external_mesa3d_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-MIT",
+        "SPDX-license-identifier-Apache-2.0",
+        "SPDX-license-identifier-GPL-1.0-or-later",
+        "SPDX-license-identifier-GPL-2.0-only",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+cc_defaults {
+    name: "_trial_c",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-Werror=missing-prototypes",
+        ],
+        "x86_64": [
+            "-Werror=missing-prototypes",
+        ],
+        "x86": [
+            "-Werror=missing-prototypes",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "-Wno-unused-function",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "_trial_msvc",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-Werror=gnu-empty-initializer",
+        "-Werror=pointer-arith",
+        "-Werror=vla",
+        "-Wgnu-pointer-arith",
+    ],
+    cppflags: select(arch(), {
+        "arm64": [
+            "-Werror=gnu-empty-initializer",
+            "-Werror=pointer-arith",
+            "-Werror=vla",
+            "-Wgnu-pointer-arith",
+        ],
+        "x86_64": [
+            "-Werror=gnu-empty-initializer",
+            "-Werror=pointer-arith",
+            "-Werror=vla",
+            "-Wgnu-pointer-arith",
+        ],
+        "x86": [
+            "-Werror=gnu-empty-initializer",
+            "-Werror=pointer-arith",
+            "-Werror=vla",
+            "-Wgnu-pointer-arith",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "_trial_soong_c",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-Werror=date-time",
+        "-Werror=gnu-alignof-expression",
+        "-Werror=ignored-qualifiers",
+        "-Werror=implicit-fallthrough",
+        "-Werror=pragma-pack",
+        "-Werror=pragma-pack-suspicious-include",
+        "-Werror=sizeof-array-div",
+        "-Werror=string-plus-int",
+        "-Werror=unreachable-code-loop-increment",
+    ],
+    cppflags: select(arch(), {
+        "arm64": [
+            "-Werror=date-time",
+            "-Werror=gnu-alignof-expression",
+            "-Werror=ignored-qualifiers",
+            "-Werror=implicit-fallthrough",
+            "-Werror=pragma-pack",
+            "-Werror=pragma-pack-suspicious-include",
+            "-Werror=sizeof-array-div",
+            "-Werror=string-plus-int",
+            "-Werror=unreachable-code-loop-increment",
+        ],
+        "x86_64": [
+            "-Werror=date-time",
+            "-Werror=gnu-alignof-expression",
+            "-Werror=ignored-qualifiers",
+            "-Werror=implicit-fallthrough",
+            "-Werror=pragma-pack",
+            "-Werror=pragma-pack-suspicious-include",
+            "-Werror=sizeof-array-div",
+            "-Werror=string-plus-int",
+            "-Werror=unreachable-code-loop-increment",
+        ],
+        "x86": [
+            "-Werror=date-time",
+            "-Werror=gnu-alignof-expression",
+            "-Werror=ignored-qualifiers",
+            "-Werror=implicit-fallthrough",
+            "-Werror=pragma-pack",
+            "-Werror=pragma-pack-suspicious-include",
+            "-Werror=sizeof-array-div",
+            "-Werror=string-plus-int",
+            "-Werror=unreachable-code-loop-increment",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "_trial_soong_cpp",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
+        ],
+        "x86_64": [
+            "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
+        ],
+        "x86": [
+            "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "aosp_mesa3d_c_link_args",
+    vendor: true,
+    ldflags: select(os(), {
+        "android": [
+            "-Wl,-plugin-opt=-emulated-tls=0",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "aosp_mesa3d_c_project_args",
+    lto: { never: true },
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-DENABLE_SHADER_CACHE",
+        "-DETIME=ETIMEDOUT",
+        "-DGLAPI_EXPORT_PROTO_ENTRY_POINTS=1",
+        "-DHAS_SCHED_GETAFFINITY",
+        "-DHAS_SCHED_H",
+        "-DHAVE_CET_H",
+        "-DHAVE_COMPRESSION",
+        "-DHAVE_DIRENT_D_TYPE",
+        "-DHAVE_DLADDR",
+        "-DHAVE_DLFCN_H",
+        "-DHAVE_DL_ITERATE_PHDR",
+        "-DHAVE_DRI2",
+        "-DHAVE_ENDIAN_H",
+        "-DHAVE_FLOCK",
+        "-DHAVE_FMEMOPEN",
+        "-DHAVE_FUNC_ATTRIBUTE_ALIAS",
+        "-DHAVE_FUNC_ATTRIBUTE_COLD",
+        "-DHAVE_FUNC_ATTRIBUTE_CONST",
+        "-DHAVE_FUNC_ATTRIBUTE_FLATTEN",
+        "-DHAVE_FUNC_ATTRIBUTE_FORMAT",
+        "-DHAVE_FUNC_ATTRIBUTE_MALLOC",
+        "-DHAVE_FUNC_ATTRIBUTE_NORETURN",
+        "-DHAVE_FUNC_ATTRIBUTE_PACKED",
+        "-DHAVE_FUNC_ATTRIBUTE_PURE",
+        "-DHAVE_FUNC_ATTRIBUTE_RETURNS_NONNULL",
+        "-DHAVE_FUNC_ATTRIBUTE_UNUSED",
+        "-DHAVE_FUNC_ATTRIBUTE_VISIBILITY",
+        "-DHAVE_FUNC_ATTRIBUTE_WARN_UNUSED_RESULT",
+        "-DHAVE_FUNC_ATTRIBUTE_WEAK",
+        "-DHAVE_GFX_COMPUTE",
+        "-DHAVE_LIBDRM",
+        "-DHAVE_LINUX_FUTEX_H",
+        "-DHAVE_MKOSTEMP",
+        "-DHAVE_OPENGL=0",
+        "-DHAVE_POLL_H",
+        "-DHAVE_POSIX_FALLOCATE",
+        "-DHAVE_POSIX_MEMALIGN",
+        "-DHAVE_PTHREAD",
+        "-DHAVE_RENDERDOC_INTEGRATION=1",
+        "-DHAVE_STRTOD_L",
+        "-DHAVE_STRTOF",
+        "-DHAVE_STRTOK_R",
+        "-DHAVE_STRUCT_TIMESPEC",
+        "-DHAVE_SYSCONF",
+        "-DHAVE_SYS_INOTIFY_H",
+        "-DHAVE_SYS_SHM_H",
+        "-DHAVE_ZLIB",
+        "-DHAVE_ZSTD",
+        "-DHAVE___BUILTIN_ADD_OVERFLOW",
+        "-DHAVE___BUILTIN_BSWAP32",
+        "-DHAVE___BUILTIN_BSWAP64",
+        "-DHAVE___BUILTIN_CLZ",
+        "-DHAVE___BUILTIN_CLZLL",
+        "-DHAVE___BUILTIN_CTZ",
+        "-DHAVE___BUILTIN_EXPECT",
+        "-DHAVE___BUILTIN_FFS",
+        "-DHAVE___BUILTIN_FFSLL",
+        "-DHAVE___BUILTIN_POPCOUNT",
+        "-DHAVE___BUILTIN_POPCOUNTLL",
+        "-DHAVE___BUILTIN_TYPES_COMPATIBLE_P",
+        "-DHAVE___BUILTIN_UNREACHABLE",
+        "-DLLVM_IS_SHARED=1",
+        "-DMAJOR_IN_SYSMACROS",
+        "-DMESA_DEBUG=0",
+        "-DMESA_LLVM_VERSION_STRING=\"16.0\"",
+        "-DMESA_SYSTEM_HAS_KMS_DRM=1",
+        "-DPACKAGE_VERSION=\"26.3.0-devel\"",
+        "-DTHREAD_SANITIZER=0",
+        "-DUSE_GCC_ATOMIC_BUILTINS",
+        "-DUSE_LIBGLVND=0",
+        "-DVIDEO_CODEC_AV1DEC=1",
+        "-DVIDEO_CODEC_AV1ENC=1",
+        "-DVIDEO_CODEC_H264DEC=0",
+        "-DVIDEO_CODEC_H264ENC=0",
+        "-DVIDEO_CODEC_H265DEC=0",
+        "-DVIDEO_CODEC_H265ENC=0",
+        "-DVIDEO_CODEC_JPEGDEC=1",
+        "-DVIDEO_CODEC_MPEG12DEC=1",
+        "-DVIDEO_CODEC_VC1DEC=0",
+        "-DVIDEO_CODEC_VP9DEC=1",
+        "-D_GNU_SOURCE",
+        "-D__STDC_CONSTANT_MACROS",
+        "-D__STDC_FORMAT_MACROS",
+        "-D__STDC_LIMIT_MACROS",
+        "-Qunused-arguments",
+        "-Werror=empty-body",
+        "-Werror=format",
+        "-Werror=implicit-function-declaration",
+        "-Werror=incompatible-pointer-types",
+        "-Werror=int-conversion",
+        "-Werror=missing-prototypes",
+        "-Werror=return-type",
+        "-Werror=thread-safety",
+        "-Wformat-security",
+        "-Wimplicit-fallthrough",
+        "-Wmisleading-indentation",
+        "-Wno-format-truncation",
+        "-Wno-microsoft-enum-value",
+        "-Wno-missing-field-initializers",
+        "-Wno-unknown-pragmas",
+        "-Wno-unused-function",
+        "-fdata-sections",
+        "-ffunction-sections",
+        "-fno-common",
+        "-fno-math-errno",
+        "-fno-trapping-math",
+    ] + select(arch(), {
+        "arm64": [
+            "-DAMD_LLVM_AVAILABLE=1",
+            "-DDRAW_LLVM_AVAILABLE=1",
+            "-DGALLIVM_USE_ORCJIT=0",
+            "-DHAVE_OPENGL_ES_1=1",
+            "-DHAVE_OPENGL_ES_2=1",
+            "-DHAVE_UINT128",
+            "-DHAVE___BUILTIN_IA32_CLFLUSHOPT",
+        ],
+        "x86_64": [
+            "-DAMD_LLVM_AVAILABLE=1",
+            "-DDRAW_LLVM_AVAILABLE=1",
+            "-DGALLIVM_USE_ORCJIT=0",
+            "-DHAVE_OPENGL_ES_1=1",
+            "-DHAVE_OPENGL_ES_2=1",
+            "-DHAVE_UINT128",
+            "-DHAVE___BUILTIN_IA32_CLFLUSHOPT",
+            "-DUSE_SSE41",
+        ],
+        "x86": [
+            "-DAMD_LLVM_AVAILABLE=1",
+            "-DDRAW_LLVM_AVAILABLE=1",
+            "-DGALLIVM_USE_ORCJIT=0",
+            "-DHAVE_OPENGL_ES_1=1",
+            "-DHAVE_OPENGL_ES_2=1",
+            "-DHAVE___BUILTIN_IA32_CLFLUSHOPT",
+            "-DUSE_SSE41",
+        ],
+        "riscv64": [
+            "-DHAVE_UINT128",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DANDROID_API_LEVEL=35",
+        ],
+        ("x86_64", "android"): [
+            "-DANDROID_API_LEVEL=35",
+        ],
+        ("x86", "android"): [
+            "-DANDROID_API_LEVEL=35",
+            "-mfpmath=sse",
+            "-msse2",
+            "-mstackrealign",
+        ],
+        ("x86_64", "linux_glibc"): [
+            "-DALLOW_KCMP",
+            "-DHAVE_FUNC_ATTRIBUTE_OPTIMIZE",
+            "-DHAVE_GNU_QSORT_R",
+            "-DHAVE_ISSIGNALING",
+            "-DHAVE_RANDOM_R",
+            "-DHAVE_SECURE_GETENV",
+            "-D__INTRODUCED_IN(api_level)=",
+            "-Wno-error=maybe-uninitialized",
+        ],
+        ("x86_64", "linux_musl"): [
+            "-DALLOW_KCMP",
+            "-DHAVE_FUNC_ATTRIBUTE_OPTIMIZE",
+            "-DHAVE_GNU_QSORT_R",
+            "-DHAVE_ISSIGNALING",
+            "-DHAVE_RANDOM_R",
+            "-DHAVE_SECURE_GETENV",
+            "-D__INTRODUCED_IN(api_level)=",
+            "-Wno-error=maybe-uninitialized",
+        ],
+        ("arm64", "linux_musl"): [
+            "-DALLOW_KCMP",
+            "-DHAVE_FUNC_ATTRIBUTE_OPTIMIZE",
+            "-DHAVE_GNU_QSORT_R",
+            "-DHAVE_ISSIGNALING",
+            "-DHAVE_RANDOM_R",
+            "-DHAVE_SECURE_GETENV",
+            "-D__INTRODUCED_IN(api_level)=",
+            "-Wno-error=maybe-uninitialized",
+        ],
+        ("riscv64", "android"): [
+            "-DAMD_LLVM_AVAILABLE=0",
+            "-DANDROID_API_LEVEL=37",
+            "-DANDROID_STRICT",
+            "-DDRAW_LLVM_AVAILABLE=0",
+            "-DGALLIVM_USE_ORCJIT=1",
+            "-DHAVE_OPENGL_ES_1=0",
+            "-DHAVE_OPENGL_ES_2=0",
+        ],
+        (default, default): [],
+    }) + select(os(), {
+        "android": [
+            "-DHAVE_ANDROID_PLATFORM",
+            "-DHAVE_GETRANDOM",
+            "-DHAVE_LINUX_UDMABUF_H",
+            "-DHAVE_MEMFD_CREATE",
+            "-DHAVE_REALLOCARRAY",
+            "-DHAVE_THRD_CREATE",
+            "-DHAVE_XLOCALE_H",
+            "-fno-emulated-tls",
+        ],
+        "linux_musl": [
+            "-DHAVE_REALLOCARRAY",
+        ],
+        "linux_glibc": [
+            "-DHAVE_XLOCALE_H",
+        ],
+        default: [],
+    }) + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "-DHAVE_PERFETTO",
+        ],
+        ("x86_64", "android", "true"): [
+            "-DHAVE_PERFETTO",
+        ],
+        ("x86", "android", "true"): [
+            "-DHAVE_PERFETTO",
+        ],
+        (default, default, default): [],
+    }),
+    target: {
+        host: {
+            compile_multilib: "64",
+        },
+    },
+}
+
+cc_defaults {
+    name: "aosp_mesa3d_cpp_link_args",
+    vendor: true,
+    ldflags: select(os(), {
+        "android": [
+            "-Wl,-plugin-opt=-emulated-tls=0",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "aosp_mesa3d_cpp_project_args",
+    lto: { never: true },
+    vendor: true,
+    host_supported: true,
+    cppflags: [
+        "-DENABLE_SHADER_CACHE",
+        "-DETIME=ETIMEDOUT",
+        "-DGLAPI_EXPORT_PROTO_ENTRY_POINTS=1",
+        "-DHAS_SCHED_GETAFFINITY",
+        "-DHAS_SCHED_H",
+        "-DHAVE_CET_H",
+        "-DHAVE_COMPRESSION",
+        "-DHAVE_DIRENT_D_TYPE",
+        "-DHAVE_DLADDR",
+        "-DHAVE_DLFCN_H",
+        "-DHAVE_DL_ITERATE_PHDR",
+        "-DHAVE_DRI2",
+        "-DHAVE_ENDIAN_H",
+        "-DHAVE_FLOCK",
+        "-DHAVE_FMEMOPEN",
+        "-DHAVE_FUNC_ATTRIBUTE_ALIAS",
+        "-DHAVE_FUNC_ATTRIBUTE_COLD",
+        "-DHAVE_FUNC_ATTRIBUTE_CONST",
+        "-DHAVE_FUNC_ATTRIBUTE_FLATTEN",
+        "-DHAVE_FUNC_ATTRIBUTE_FORMAT",
+        "-DHAVE_FUNC_ATTRIBUTE_MALLOC",
+        "-DHAVE_FUNC_ATTRIBUTE_NORETURN",
+        "-DHAVE_FUNC_ATTRIBUTE_PACKED",
+        "-DHAVE_FUNC_ATTRIBUTE_PURE",
+        "-DHAVE_FUNC_ATTRIBUTE_RETURNS_NONNULL",
+        "-DHAVE_FUNC_ATTRIBUTE_UNUSED",
+        "-DHAVE_FUNC_ATTRIBUTE_VISIBILITY",
+        "-DHAVE_FUNC_ATTRIBUTE_WARN_UNUSED_RESULT",
+        "-DHAVE_FUNC_ATTRIBUTE_WEAK",
+        "-DHAVE_GFX_COMPUTE",
+        "-DHAVE_LIBDRM",
+        "-DHAVE_LINUX_FUTEX_H",
+        "-DHAVE_MKOSTEMP",
+        "-DHAVE_OPENGL=0",
+        "-DHAVE_POLL_H",
+        "-DHAVE_POSIX_FALLOCATE",
+        "-DHAVE_POSIX_MEMALIGN",
+        "-DHAVE_PTHREAD",
+        "-DHAVE_RENDERDOC_INTEGRATION=1",
+        "-DHAVE_STRTOD_L",
+        "-DHAVE_STRTOF",
+        "-DHAVE_STRTOK_R",
+        "-DHAVE_STRUCT_TIMESPEC",
+        "-DHAVE_SYSCONF",
+        "-DHAVE_SYS_INOTIFY_H",
+        "-DHAVE_SYS_SHM_H",
+        "-DHAVE_ZLIB",
+        "-DHAVE_ZSTD",
+        "-DHAVE___BUILTIN_ADD_OVERFLOW",
+        "-DHAVE___BUILTIN_BSWAP32",
+        "-DHAVE___BUILTIN_BSWAP64",
+        "-DHAVE___BUILTIN_CLZ",
+        "-DHAVE___BUILTIN_CLZLL",
+        "-DHAVE___BUILTIN_CTZ",
+        "-DHAVE___BUILTIN_EXPECT",
+        "-DHAVE___BUILTIN_FFS",
+        "-DHAVE___BUILTIN_FFSLL",
+        "-DHAVE___BUILTIN_POPCOUNT",
+        "-DHAVE___BUILTIN_POPCOUNTLL",
+        "-DHAVE___BUILTIN_TYPES_COMPATIBLE_P",
+        "-DHAVE___BUILTIN_UNREACHABLE",
+        "-DLLVM_IS_SHARED=1",
+        "-DMAJOR_IN_SYSMACROS",
+        "-DMESA_DEBUG=0",
+        "-DMESA_LLVM_VERSION_STRING=\"16.0\"",
+        "-DMESA_SYSTEM_HAS_KMS_DRM=1",
+        "-DPACKAGE_VERSION=\"26.3.0-devel\"",
+        "-DTHREAD_SANITIZER=0",
+        "-DUSE_GCC_ATOMIC_BUILTINS",
+        "-DUSE_LIBGLVND=0",
+        "-DVIDEO_CODEC_AV1DEC=1",
+        "-DVIDEO_CODEC_AV1ENC=1",
+        "-DVIDEO_CODEC_H264DEC=0",
+        "-DVIDEO_CODEC_H264ENC=0",
+        "-DVIDEO_CODEC_H265DEC=0",
+        "-DVIDEO_CODEC_H265ENC=0",
+        "-DVIDEO_CODEC_JPEGDEC=1",
+        "-DVIDEO_CODEC_MPEG12DEC=1",
+        "-DVIDEO_CODEC_VC1DEC=0",
+        "-DVIDEO_CODEC_VP9DEC=1",
+        "-D_GNU_SOURCE",
+        "-D__STDC_CONSTANT_MACROS",
+        "-D__STDC_FORMAT_MACROS",
+        "-D__STDC_LIMIT_MACROS",
+        "-Qunused-arguments",
+        "-Werror=empty-body",
+        "-Werror=format",
+        "-Werror=return-type",
+        "-Wformat-security",
+        "-Wmisleading-indentation",
+        "-Wno-format-truncation",
+        "-Wno-microsoft-enum-value",
+        "-Wno-missing-field-initializers",
+        "-Wno-non-virtual-dtor",
+        "-Wno-unknown-pragmas",
+        "-fdata-sections",
+        "-ffunction-sections",
+        "-fno-math-errno",
+        "-fno-trapping-math",
+    ] + select(arch(), {
+        "arm64": [
+            "-DAMD_LLVM_AVAILABLE=1",
+            "-DDRAW_LLVM_AVAILABLE=1",
+            "-DGALLIVM_USE_ORCJIT=0",
+            "-DHAVE_OPENGL_ES_1=1",
+            "-DHAVE_OPENGL_ES_2=1",
+            "-DHAVE_UINT128",
+            "-DHAVE___BUILTIN_IA32_CLFLUSHOPT",
+        ],
+        "x86_64": [
+            "-DAMD_LLVM_AVAILABLE=1",
+            "-DDRAW_LLVM_AVAILABLE=1",
+            "-DGALLIVM_USE_ORCJIT=0",
+            "-DHAVE_OPENGL_ES_1=1",
+            "-DHAVE_OPENGL_ES_2=1",
+            "-DHAVE_UINT128",
+            "-DHAVE___BUILTIN_IA32_CLFLUSHOPT",
+            "-DUSE_SSE41",
+        ],
+        "x86": [
+            "-DAMD_LLVM_AVAILABLE=1",
+            "-DDRAW_LLVM_AVAILABLE=1",
+            "-DGALLIVM_USE_ORCJIT=0",
+            "-DHAVE_OPENGL_ES_1=1",
+            "-DHAVE_OPENGL_ES_2=1",
+            "-DHAVE___BUILTIN_IA32_CLFLUSHOPT",
+            "-DUSE_SSE41",
+        ],
+        "riscv64": [
+            "-DHAVE_UINT128",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DANDROID_API_LEVEL=35",
+        ],
+        ("x86_64", "android"): [
+            "-DANDROID_API_LEVEL=35",
+        ],
+        ("x86", "android"): [
+            "-DANDROID_API_LEVEL=35",
+            "-mfpmath=sse",
+            "-msse2",
+            "-mstackrealign",
+        ],
+        ("x86_64", "linux_glibc"): [
+            "-DALLOW_KCMP",
+            "-DHAVE_FUNC_ATTRIBUTE_OPTIMIZE",
+            "-DHAVE_GNU_QSORT_R",
+            "-DHAVE_ISSIGNALING",
+            "-DHAVE_RANDOM_R",
+            "-DHAVE_SECURE_GETENV",
+            "-D__INTRODUCED_IN(api_level)=",
+            "-Wno-error=maybe-uninitialized",
+        ],
+        ("x86_64", "linux_musl"): [
+            "-DALLOW_KCMP",
+            "-DHAVE_FUNC_ATTRIBUTE_OPTIMIZE",
+            "-DHAVE_GNU_QSORT_R",
+            "-DHAVE_ISSIGNALING",
+            "-DHAVE_RANDOM_R",
+            "-DHAVE_SECURE_GETENV",
+            "-D__INTRODUCED_IN(api_level)=",
+            "-Wno-error=maybe-uninitialized",
+        ],
+        ("arm64", "linux_musl"): [
+            "-DALLOW_KCMP",
+            "-DHAVE_FUNC_ATTRIBUTE_OPTIMIZE",
+            "-DHAVE_GNU_QSORT_R",
+            "-DHAVE_ISSIGNALING",
+            "-DHAVE_RANDOM_R",
+            "-DHAVE_SECURE_GETENV",
+            "-D__INTRODUCED_IN(api_level)=",
+            "-Wno-error=maybe-uninitialized",
+        ],
+        ("riscv64", "android"): [
+            "-DAMD_LLVM_AVAILABLE=0",
+            "-DANDROID_API_LEVEL=37",
+            "-DANDROID_STRICT",
+            "-DDRAW_LLVM_AVAILABLE=0",
+            "-DGALLIVM_USE_ORCJIT=1",
+            "-DHAVE_OPENGL_ES_1=0",
+            "-DHAVE_OPENGL_ES_2=0",
+        ],
+        (default, default): [],
+    }) + select(os(), {
+        "android": [
+            "-DHAVE_ANDROID_PLATFORM",
+            "-DHAVE_GETRANDOM",
+            "-DHAVE_LINUX_UDMABUF_H",
+            "-DHAVE_MEMFD_CREATE",
+            "-DHAVE_REALLOCARRAY",
+            "-DHAVE_THRD_CREATE",
+            "-DHAVE_XLOCALE_H",
+            "-fno-emulated-tls",
+        ],
+        "linux_musl": [
+            "-DHAVE_REALLOCARRAY",
+        ],
+        "linux_glibc": [
+            "-DHAVE_XLOCALE_H",
+        ],
+        default: [],
+    }) + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "-DHAVE_PERFETTO",
+        ],
+        ("x86_64", "android", "true"): [
+            "-DHAVE_PERFETTO",
+        ],
+        ("x86", "android", "true"): [
+            "-DHAVE_PERFETTO",
+        ],
+        (default, default, default): [],
+    }),
+    target: {
+        host: {
+            compile_multilib: "64",
+        },
+    },
+}
+
+cc_defaults {
+    name: "clflushopt_args",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "x86_64": [
+            "-mclflushopt",
+        ],
+        "x86": [
+            "-mclflushopt",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "ld_args_bsymbolic",
+    vendor: true,
+    host_supported: true,
+    ldflags: [
+        "-Wl,-Bsymbolic",
+    ],
+}
+
+cc_defaults {
+    name: "ld_args_build_id",
+    vendor: true,
+    ldflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-Wl,--build-id=sha1",
+        ],
+        ("riscv64", "android"): [
+            "-Wl,--build-id=sha1",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "ld_args_gc_sections",
+    vendor: true,
+    host_supported: true,
+    ldflags: [
+        "-Wl,--gc-sections",
+    ],
+}
+
+cc_defaults {
+    name: "no_override_init_args",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-Wno-initializer-overrides",
+        "-Wno-override-init",
+    ],
+}
+
+cc_defaults {
+    name: "sse41_args",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "x86_64": [
+            "-msse4.1",
+        ],
+        "x86": [
+            "-msse4.1",
+        ],
+        default: [],
+    }),
+}
+
+rust_defaults {
+    name: "rust_2024_lint_args",
+    vendor: true,
+    host_supported: true,
+    flags: select(arch(), {
+        "arm64": [
+            "-Dunsafe_op_in_unsafe_fn",
+        ],
+        "x86_64": [
+            "-Dunsafe_op_in_unsafe_fn",
+        ],
+        "x86": [
+            "-Dunsafe_op_in_unsafe_fn",
+        ],
+        default: [],
+    }),
+}
+
+rust_defaults {
+    name: "rust_global_args",
+    vendor: true,
+    host_supported: true,
+    flags: select(arch(), {
+        "arm64": [
+            "-Aclippy::collapsible_else_if",
+            "-Aclippy::needless_lifetimes",
+            "-Aclippy::question_mark",
+        ],
+        "x86_64": [
+            "-Aclippy::collapsible_else_if",
+            "-Aclippy::needless_lifetimes",
+            "-Aclippy::question_mark",
+        ],
+        "x86": [
+            "-Aclippy::collapsible_else_if",
+            "-Aclippy::needless_lifetimes",
+            "-Aclippy::question_mark",
+        ],
+        default: [],
+    }),
+}
+
+/*
+ * This is a special handwritten template for gfxstream compatibility.
+ * Parts of the Android tree, notably:
+ *
+ *    - hardware/google/gfxstream
+ *    - device/generic/goldfish
+ *
+ * have a dependency on this code.  They **shouldn't**, but they do.
+ * This dependency may be removed when:
+ *
+ *    - gfxstream Github migration is complete
+ *    - gfxstream GLES is deleted
+ *    - out-of-tree goldfish drivers are removed in favor of virtio
+ *
+ */
+
+cc_library_headers {
+    name: "mesa_common_headers",
+    vendor_available: true,
+    host_supported: true,
+    export_include_dirs: [
+        "src",
+        "include",
+    ],
+}
+
+cc_library_headers {
+    name: "mesa_src_headers",
+    vendor_available: true,
+    host_supported: true,
+    export_include_dirs: [
+        "src",
+    ],
+}
+
+cc_library_headers {
+    name: "mesa_gfxstream_virtgpu",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: [
+        "src/gfxstream/guest/platform/include",
+    ],
+}
+
+cc_library_headers {
+    name: "virtgpu_kumquat_ffi_headers_mesa3d",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: [
+        "src/virtio/magma-gpu-rs/ffi/virtgpu_kumquat_ffi/include",
+    ],
+}
+
+cc_library_headers {
+    name: "mesa_gfxstream_guest_android_headers",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: [
+        "src/gfxstream/guest/android",
+    ],
+}
+
+cc_library_headers {
+    name: "mesa_gfxstream_aemu_headers",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: [
+        "src/gfxstream/aemu/include",
+    ],
+}
+
+cc_defaults {
+    name: "mesa_platform_virtgpu_defaults",
+    vendor: true,
+    header_libs: [
+        "inc_platform_virtgpu",
+        "inc_src",
+        "mesa_gfxstream_virtgpu",
+        "mesa_src_headers",
+    ],
+    whole_static_libs: [
+        "mesa_platform_virtgpu",
+    ],
+    static_libs: [
+        "mesa_util",
+        "mesa_util_c11",
+        "vulkan_util",
+    ],
+    shared_libs: [
+        "libdrm",
+    ],
+    export_shared_lib_headers: [
+        "libdrm",
+    ],
+    target: {
+        android: {
+            shared_libs: [
+                "libcutils",
+                "libhardware",
+                "liblog",
+                "libnativewindow",
+                "libsync",
+            ],
+        },
+    },
+}
+
+cc_library_headers {
+    name: "mesa_gfxstream_guest_iostream",
+    vendor: true,
+    host_supported: true,
+    shared_libs: [
+        "liblog",
+    ],
+    export_shared_lib_headers: [
+        "liblog",
+    ],
+    export_include_dirs: [
+        "src/gfxstream/guest/iostream/include",
+    ],
+}
+
+cc_library_static {
+    name: "mesa_platform_virtgpu",
+    vendor: true,
+    host_supported: true,
+    whole_static_libs: [
+        "platform_virtgpu",
+        "platform_virtgpu_kumquat",
+        "platform_virtgpu_drm",
+        "libvirtgpu_kumquat_ffi",
+        "gfxstream_vulkan_mapper",
+    ],
+    static_libs: [
+        "mesa_util",
+        "mesa_util_c11",
+        "vulkan_util",
+    ],
+    shared_libs: [
+        "libdrm",
+    ],
+    export_shared_lib_headers: [
+        "libdrm",
+    ],
+    target: {
+        host: {
+            compile_multilib: "64",
+        },
+        android: {
+            shared_libs: [
+                "libcutils",
+                "libhardware",
+                "liblog",
+                "libnativewindow",
+                "libsync",
+            ],
+        },
+    },
+}
+
+cc_library_static {
+    name: "mesa_gfxstream_connection_manager",
+    vendor: true,
+    host_supported: true,
+    whole_static_libs: ["connection_manager"],
+    export_include_dirs: ["src/gfxstream/guest/connection-manager"],
+    target: {
+        host: {
+            compile_multilib: "64",
+        },
+    },
+}
+
+cc_library_static {
+    name: "mesa_goldfish_address_space",
+    vendor: true,
+    host_supported: true,
+    whole_static_libs: ["goldfish_address_space"],
+    export_include_dirs: ["src/gfxstream/guest/GoldfishAddressSpace/include"],
+    target: {
+        host: {
+            compile_multilib: "64",
+        },
+    },
+}
+
+cc_library_static {
+    name: "mesa_gfxstream_guest_android",
+    vendor: true,
+    host_supported: true,
+    whole_static_libs: ["gfxstream_android"],
+    export_include_dirs: ["src/gfxstream/guest/android/include"],
+    target: {
+        host: {
+            compile_multilib: "64",
+        },
+    },
+}

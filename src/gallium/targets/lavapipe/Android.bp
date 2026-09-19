@@ -1,0 +1,306 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "vulkan_lvp_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "arm64": [
+            "-DGALLIUM_LLVMPIPE",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DGALLIUM_LLVMPIPE",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DGALLIUM_LLVMPIPE",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "vulkan_lvp_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-DGALLIUM_LLVMPIPE",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DGALLIUM_LLVMPIPE",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DGALLIUM_LLVMPIPE",
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_library_shared {
+    name: "vulkan.lvp",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "ld_args_bsymbolic",
+        "ld_args_gc_sections",
+        "vulkan_lvp_c_flags",
+        "vulkan_lvp_cpp_flags",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_gallium",
+            "inc_gallium_aux",
+            "inc_gallium_drivers",
+            "inc_gallium_winsys",
+            "inc_include",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86_64": [
+            "inc_gallium",
+            "inc_gallium_aux",
+            "inc_gallium_drivers",
+            "inc_gallium_winsys",
+            "inc_include",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86": [
+            "inc_gallium",
+            "inc_gallium_aux",
+            "inc_gallium_drivers",
+            "inc_gallium_winsys",
+            "inc_include",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86_64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86", "android"): [
+            "hwvulkan_headers",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select(arch(), {
+        "arm64": [
+            "lavapipe_target.c",
+        ],
+        "x86_64": [
+            "lavapipe_target.c",
+        ],
+        "x86": [
+            "lavapipe_target.c",
+        ],
+        default: [],
+    }),
+    static_libs: select(arch(), {
+        "arm64": [
+            "blake3",
+            "compiler",
+            "gallium",
+            "lavapipe_st",
+            "libLLVM16_swiftshader",
+            "llvmpipe",
+            "loader",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+            "pipe_loader_static",
+            "vtn",
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_util",
+            "vulkan_wsi",
+            "ws_null",
+            "wsw",
+            "xmlconfig",
+        ],
+        "x86_64": [
+            "blake3",
+            "compiler",
+            "gallium",
+            "lavapipe_st",
+            "libLLVM16_swiftshader",
+            "llvmpipe",
+            "loader",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "nir",
+            "pipe_loader_static",
+            "vtn",
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_util",
+            "vulkan_wsi",
+            "ws_null",
+            "wsw",
+            "xmlconfig",
+        ],
+        "x86": [
+            "blake3",
+            "compiler",
+            "gallium",
+            "lavapipe_st",
+            "libLLVM16_swiftshader",
+            "llvmpipe",
+            "loader",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "nir",
+            "pipe_loader_static",
+            "vtn",
+            "vulkan_instance",
+            "vulkan_lite_runtime",
+            "vulkan_runtime",
+            "vulkan_util",
+            "vulkan_wsi",
+            "ws_null",
+            "wsw",
+            "xmlconfig",
+        ],
+        default: [],
+    }) + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "_mesa_u_gralloc",
+        ],
+        ("x86_64", "android"): [
+            "_mesa_u_gralloc",
+        ],
+        ("x86", "android"): [
+            "_mesa_u_gralloc",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select(arch(), {
+        "arm64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86_64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libui",
+        ],
+        ("x86_64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libui",
+        ],
+        ("x86", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libui",
+        ],
+        (default, default): [],
+    }),
+    whole_static_libs: select(arch(), {
+        "arm64": [
+            "lavapipe_st",
+        ],
+        "x86_64": [
+            "lavapipe_st",
+        ],
+        "x86": [
+            "lavapipe_st",
+        ],
+        default: [],
+    }),
+    target: {
+        android: {
+            relative_install_path: "hw",
+        },
+    },
+}

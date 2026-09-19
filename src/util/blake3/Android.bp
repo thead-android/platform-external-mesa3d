@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "blake3_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-Wno-error",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "blake3_x86_no_simd_defs",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("x86", "android"): [
+            "-DBLAKE3_NO_AVX2",
+            "-DBLAKE3_NO_AVX512",
+            "-DBLAKE3_NO_SSE2",
+            "-DBLAKE3_NO_SSE41",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "blake3",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "blake3_c_flags",
+        "blake3_x86_no_simd_defs",
+    ],
+    srcs: [
+        "blake3.c",
+        "blake3_dispatch.c",
+        "blake3_portable.c",
+    ] + select((arch(), os()), {
+        ("arm64", "android"): [
+            "blake3_neon.c",
+        ],
+        ("arm64", "linux_musl"): [
+            "blake3_neon.c",
+        ],
+        (default, default): [],
+    }) + select(arch(), {
+        "x86_64": [
+            "blake3_avx2_x86-64_unix.S",
+            "blake3_avx512_x86-64_unix.S",
+            "blake3_sse2_x86-64_unix.S",
+            "blake3_sse41_x86-64_unix.S",
+        ],
+        default: [],
+    }),
+}

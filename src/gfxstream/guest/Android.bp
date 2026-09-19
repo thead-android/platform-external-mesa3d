@@ -1,0 +1,104 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "gfxstream_guest_args",
+    vendor: true,
+    host_supported: true,
+    cppflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DGFXSTREAM_ENABLE_GUEST_GOLDFISH",
+        ],
+        ("x86_64", "android"): [
+            "-DGFXSTREAM_ENABLE_GUEST_GOLDFISH",
+        ],
+        ("x86", "android"): [
+            "-DGFXSTREAM_ENABLE_GUEST_GOLDFISH",
+        ],
+        ("x86_64", "linux_glibc"): [
+            "-DEND2END_TESTS",
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        ("x86_64", "linux_musl"): [
+            "-DEND2END_TESTS",
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        ("arm64", "linux_musl"): [
+            "-DEND2END_TESTS",
+            "-DVK_USE_PLATFORM_ANDROID_KHR",
+        ],
+        (default, default): [],
+    }) + select(arch(), {
+        "arm64": [
+            "-DVK_BASE_VERSION_1_0",
+            "-DVK_BASE_VERSION_1_1",
+            "-DVK_BASE_VERSION_1_2",
+            "-DVK_BASE_VERSION_1_3",
+            "-DVK_BASE_VERSION_1_4",
+            "-DVK_COMPUTE_VERSION_1_0",
+            "-DVK_COMPUTE_VERSION_1_1",
+            "-DVK_COMPUTE_VERSION_1_2",
+            "-DVK_COMPUTE_VERSION_1_3",
+            "-DVK_COMPUTE_VERSION_1_4",
+            "-DVK_GFXSTREAM_STRUCTURE_TYPE_EXT",
+            "-DVK_GRAPHICS_VERSION_1_0",
+            "-DVK_GRAPHICS_VERSION_1_1",
+            "-DVK_GRAPHICS_VERSION_1_2",
+            "-DVK_GRAPHICS_VERSION_1_3",
+            "-DVK_GRAPHICS_VERSION_1_4",
+            "-D_FILE_OFFSET_BITS=64",
+        ],
+        "x86_64": [
+            "-DVK_BASE_VERSION_1_0",
+            "-DVK_BASE_VERSION_1_1",
+            "-DVK_BASE_VERSION_1_2",
+            "-DVK_BASE_VERSION_1_3",
+            "-DVK_BASE_VERSION_1_4",
+            "-DVK_COMPUTE_VERSION_1_0",
+            "-DVK_COMPUTE_VERSION_1_1",
+            "-DVK_COMPUTE_VERSION_1_2",
+            "-DVK_COMPUTE_VERSION_1_3",
+            "-DVK_COMPUTE_VERSION_1_4",
+            "-DVK_GFXSTREAM_STRUCTURE_TYPE_EXT",
+            "-DVK_GRAPHICS_VERSION_1_0",
+            "-DVK_GRAPHICS_VERSION_1_1",
+            "-DVK_GRAPHICS_VERSION_1_2",
+            "-DVK_GRAPHICS_VERSION_1_3",
+            "-DVK_GRAPHICS_VERSION_1_4",
+            "-D_FILE_OFFSET_BITS=64",
+        ],
+        "x86": [
+            "-DVK_BASE_VERSION_1_0",
+            "-DVK_BASE_VERSION_1_1",
+            "-DVK_BASE_VERSION_1_2",
+            "-DVK_BASE_VERSION_1_3",
+            "-DVK_BASE_VERSION_1_4",
+            "-DVK_COMPUTE_VERSION_1_0",
+            "-DVK_COMPUTE_VERSION_1_1",
+            "-DVK_COMPUTE_VERSION_1_2",
+            "-DVK_COMPUTE_VERSION_1_3",
+            "-DVK_COMPUTE_VERSION_1_4",
+            "-DVK_GFXSTREAM_STRUCTURE_TYPE_EXT",
+            "-DVK_GRAPHICS_VERSION_1_0",
+            "-DVK_GRAPHICS_VERSION_1_1",
+            "-DVK_GRAPHICS_VERSION_1_2",
+            "-DVK_GRAPHICS_VERSION_1_3",
+            "-DVK_GRAPHICS_VERSION_1_4",
+            "-D_FILE_OFFSET_BITS=64",
+        ],
+        default: [],
+    }),
+}

@@ -1,0 +1,370 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "vk_bvh_includes",
+    srcs: [
+        "spirv_internal_exts.h",
+    ],
+}
+
+python_binary_host {
+    name: "spirv_info_py_binary",
+    main: "spirv_info_gen.py",
+    srcs: [
+        "spirv_info_gen.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "vtn_gather_types_c_py_binary",
+    main: "vtn_gather_types_c.py",
+    srcs: [
+        "vtn_gather_types_c.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "vtn_generator_ids_h_py_binary",
+    main: "vtn_generator_ids_h.py",
+    srcs: [
+        "vtn_generator_ids_h.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "spirv_info_headers",
+    out: [
+        "src/compiler/spirv/spirv_info.h",
+    ],
+    srcs: [
+        "spirv.core.grammar.json",
+    ],
+    tools: [
+        "spirv_info_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/compiler",
+        "src/compiler/spirv",
+    ],
+    cmd: "$(location spirv_info_py_binary) --json $(location " +
+        "spirv.core.grammar.json) --out-h $(location " +
+        "src/compiler/spirv/spirv_info.h) --out-c " +
+        "$(genDir)/src/compiler/spirv/spirv_info.c",
+}
+
+genrule {
+    name: "spirv_info_impl",
+    out: [
+        "src/compiler/spirv/spirv_info.c",
+    ],
+    srcs: [
+        "spirv.core.grammar.json",
+    ],
+    tools: [
+        "spirv_info_py_binary",
+    ],
+    cmd: "$(location spirv_info_py_binary) --json $(location " +
+        "spirv.core.grammar.json) --out-h " +
+        "$(genDir)/src/compiler/spirv/spirv_info.h --out-c $(location " +
+        "src/compiler/spirv/spirv_info.c)",
+}
+
+genrule {
+    name: "vtn_gather_types.c",
+    out: [
+        "vtn_gather_types.c",
+    ],
+    srcs: [
+        "spirv.core.grammar.json",
+    ],
+    tools: [
+        "vtn_gather_types_c_py_binary",
+    ],
+    cmd: "$(location vtn_gather_types_c_py_binary) $(location " +
+        "spirv.core.grammar.json) $(location vtn_gather_types.c)",
+}
+
+genrule {
+    name: "vtn_generator_ids.h",
+    out: [
+        "src/compiler/spirv/vtn_generator_ids.h",
+    ],
+    srcs: [
+        "spir-v.xml",
+    ],
+    tools: [
+        "vtn_generator_ids_h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/compiler",
+        "src/compiler/spirv",
+    ],
+    cmd: "$(location vtn_generator_ids_h_py_binary) $(location spir-v.xml) " +
+        "$(location src/compiler/spirv/vtn_generator_ids.h)",
+}
+
+cc_defaults {
+    name: "spirv2nir_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-DXXH_FORCE_ALIGN_CHECK=0",
+        "-DXXH_FORCE_MEMORY_ACCESS=0",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "spirv2nir_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: [
+        "-DXXH_FORCE_ALIGN_CHECK=0",
+        "-DXXH_FORCE_MEMORY_ACCESS=0",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "vtn_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-DXXH_FORCE_ALIGN_CHECK=0",
+        "-DXXH_FORCE_MEMORY_ACCESS=0",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "vtn_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: [
+        "-DXXH_FORCE_ALIGN_CHECK=0",
+        "-DXXH_FORCE_MEMORY_ACCESS=0",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_library_static {
+    name: "vtn",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "_trial_soong_c",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "no_override_init_args",
+        "vtn_c_flags",
+        "vtn_cpp_flags",
+    ],
+    header_libs: [
+        "inc_compiler",
+        "inc_include",
+        "inc_nir",
+        "inc_src",
+        "inc_util",
+        "inc_util_c11",
+    ] + select(os(), {
+        "android": [
+            "hwvulkan_headers",
+        ],
+        default: [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "ir_expression_operation.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "shader_stats.h",
+        "spirv_info_headers",
+        "u_format_gen.h",
+        "vtn_generator_ids.h",
+    ],
+    srcs: [
+        ":spirv_info_impl",
+        ":vtn_gather_types.c",
+        "gl_spirv.c",
+        "spirv_to_nir.c",
+        "vtn_alu.c",
+        "vtn_amd.c",
+        "vtn_cfg.c",
+        "vtn_cmat.c",
+        "vtn_debug.c",
+        "vtn_glsl450.c",
+        "vtn_opencl.c",
+        "vtn_structured_cfg.c",
+        "vtn_subgroup.c",
+        "vtn_variables.c",
+    ],
+    static_libs: [
+        "blake3",
+        "compiler",
+        "mesa_util",
+        "mesa_util_c11",
+        "mesa_util_simd",
+        "nir",
+    ] + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "x86_64": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        "x86": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        default: [],
+    }),
+    shared_libs: [
+        "libdrm",
+        "libz",
+        "libzstd",
+    ] + select(os(), {
+        "android": [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        default: [],
+    }),
+}
+
+cc_binary {
+    name: "spirv2nir",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    enabled: false,
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "no_override_init_args",
+        "spirv2nir_c_flags",
+        "spirv2nir_cpp_flags",
+    ],
+    header_libs: [
+        "inc_compiler",
+        "inc_include",
+        "inc_nir",
+        "inc_src",
+        "inc_util",
+        "inc_util_c11",
+    ] + select(os(), {
+        "android": [
+            "hwvulkan_headers",
+        ],
+        default: [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "ir_expression_operation.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "shader_stats.h",
+        "spirv_info_headers",
+        "u_format_gen.h",
+        "vtn_generator_ids.h",
+    ],
+    srcs: [
+        "spirv2nir.c",
+    ],
+    static_libs: [
+        "blake3",
+        "compiler",
+        "mesa_util",
+        "mesa_util_c11",
+        "mesa_util_simd",
+        "nir",
+        "vtn",
+    ] + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "x86_64": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        "x86": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        default: [],
+    }),
+    shared_libs: [
+        "libdrm",
+        "libz",
+        "libzstd",
+    ] + select(os(), {
+        "android": [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        default: [],
+    }),
+}

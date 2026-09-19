@@ -15,6 +15,7 @@ license_texts = ["LICENSE"]
 vulkan_lvp = "vulkan.lvp"
 vulkan_gfxstream = "vulkan.ranchu"
 vulkan_freedreno = "vulkan.freedreno"
+vulkan_powervr_mesa = "vulkan.powervr"
 
 [custom_target]
 [custom_target.workarounds]
@@ -110,3 +111,31 @@ vulkan-drivers = "swrast"
 gallium-drivers = ""
 opengl = false
 egl = "disabled"
+
+[[config]]
+config_name = 'aosp_lpi4a_powervr'
+
+[config.platforms]
+host_platforms = ["android_riscv64"]
+build_platforms = ["linux_glibc_x86_64"]
+
+[config.static_options]
+glx = "disabled"
+zlib = "enabled"
+zstd = "disabled"
+platforms = "android"
+android-strict = true
+platform-sdk-version = "37"
+vulkan-drivers = "imagination"
+imagination-srv = false
+imagination-android-precompiled = true
+gallium-drivers = ""
+opengl = false
+egl = "disabled"
+gbm = "disabled"
+gles1 = "disabled"
+gles2 = "disabled"
+llvm = "disabled"
+mesa-clc = "system"
+precomp-compiler = "system"
+b_lto = false

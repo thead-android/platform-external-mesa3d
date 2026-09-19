@@ -1,0 +1,81 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "freedreno_ir2_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "freedreno_ir2",
+    vendor: true,
+    c_std: "c11",
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "freedreno_ir2_c_flags",
+        "no_override_init_args",
+    ],
+    header_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "inc_freedreno",
+            "inc_include",
+            "inc_src",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "a2xx.xml.h",
+        "a2xx_perfcntrs.json.h",
+        "a3xx.xml.h",
+        "a4xx.xml.h",
+        "a5xx.xml.h",
+        "a5xx_perfcntrs.json.h",
+        "a6xx-pack.xml.h",
+        "a6xx.xml.h",
+        "a6xx_descriptors.xml.h",
+        "a6xx_enums.xml.h",
+        "a6xx_gmu.xml.h",
+        "a6xx_perfcntrs.json.h",
+        "a6xx_perfcntrs.xml.h",
+        "a7xx_enums.xml.h",
+        "a7xx_perfcntrs.json.h",
+        "a7xx_perfcntrs.xml.h",
+        "a8xx_descriptors.xml.h",
+        "a8xx_enums.xml.h",
+        "a8xx_perfcntrs.json.h",
+        "a8xx_perfcntrs.xml.h",
+        "adreno-pm4-pack.xml.h",
+        "adreno.xml.h",
+        "adreno_common.xml.h",
+        "adreno_control_regs.xml.h",
+        "adreno_pipe_regs.xml.h",
+        "adreno_pm4.xml.h",
+        "ocmem.xml.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "disasm-a2xx.c",
+        ],
+        (default, default): [],
+    }),
+}

@@ -1,0 +1,94 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_libgallium_4",
+    srcs: [
+        "draw_context.c",
+        "draw_fs.c",
+        "draw_gs.c",
+        "draw_llvm.c",
+        "draw_mesh.c",
+        "draw_mesh_prim.c",
+        "draw_pipe.c",
+        "draw_pipe_aaline.c",
+        "draw_pipe_aapoint.c",
+        "draw_pipe_clip.c",
+        "draw_pipe_cull.c",
+        "draw_pipe_flatshade.c",
+        "draw_pipe_offset.c",
+        "draw_pipe_pstipple.c",
+        "draw_pipe_stipple.c",
+        "draw_pipe_twoside.c",
+        "draw_pipe_unfilled.c",
+        "draw_pipe_user_cull.c",
+        "draw_pipe_util.c",
+        "draw_pipe_validate.c",
+        "draw_pipe_vbuf.c",
+        "draw_pipe_wide_line.c",
+        "draw_pipe_wide_point.c",
+        "draw_prim_assembler.c",
+        "draw_pt.c",
+        "draw_pt_emit.c",
+        "draw_pt_fetch.c",
+        "draw_pt_fetch_shade_emit.c",
+        "draw_pt_fetch_shade_pipeline.c",
+        "draw_pt_fetch_shade_pipeline_llvm.c",
+        "draw_pt_mesh_pipeline.c",
+        "draw_pt_post_vs.c",
+        "draw_pt_so_emit.c",
+        "draw_pt_util.c",
+        "draw_pt_vsplit.c",
+        "draw_tess.c",
+        "draw_vertex.c",
+        "draw_vs.c",
+        "draw_vs_exec.c",
+        "draw_vs_llvm.c",
+        "draw_vs_variant.c",
+    ],
+}
+
+python_binary_host {
+    name: "draw_nir_lower_opcodes_py_binary",
+    main: "draw_nir_lower_opcodes.py",
+    srcs: [
+        ":nir_algebraic.py",
+        ":nir_opcodes.py",
+        "draw_nir_lower_opcodes.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+cc_library_headers {
+    name: "inc_src_gallium_auxiliary_draw",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}

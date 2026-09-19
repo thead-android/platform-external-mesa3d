@@ -1,0 +1,135 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+python_binary_host {
+    name: "builtin_types_c_py_binary",
+    main: "builtin_types_c.py",
+    srcs: [
+        "builtin_types.py",
+        "builtin_types_c.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "builtin_types_h_py_binary",
+    main: "builtin_types_h.py",
+    srcs: [
+        "builtin_types.py",
+        "builtin_types_h.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "builtin_types.c",
+    out: [
+        "builtin_types.c",
+    ],
+    tools: [
+        "builtin_types_c_py_binary",
+    ],
+    cmd: "$(location builtin_types_c_py_binary) $(location builtin_types.c)",
+}
+
+genrule {
+    name: "builtin_types.h",
+    out: [
+        "src/compiler/builtin_types.h",
+    ],
+    srcs: [
+        ":u_format_gen.h",
+    ],
+    tools: [
+        "builtin_types_h_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/compiler",
+    ],
+    cmd: "$(location builtin_types_h_py_binary) $(location " +
+        "src/compiler/builtin_types.h)",
+}
+
+genrule {
+    name: "ir_expression_operation.h",
+    out: [
+        "src/compiler/ir_expression_operation.h",
+    ],
+    tools: [
+        "ir_expression_operation_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/compiler",
+    ],
+    cmd: "$(location ir_expression_operation_py_binary) enum > $(location " +
+        "src/compiler/ir_expression_operation.h)",
+}
+
+cc_library_headers {
+    name: "inc_compiler",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: [
+        ".",
+    ],
+}
+
+cc_defaults {
+    name: "compiler_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_library_static {
+    name: "compiler",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "_trial_soong_c",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "compiler_c_flags",
+        "no_override_init_args",
+    ],
+    header_libs: [
+        "inc_compiler",
+        "inc_include",
+        "inc_src",
+    ],
+    generated_headers: [
+        "builtin_types.h",
+        "ir_expression_operation.h",
+        "u_format_gen.h",
+    ],
+    srcs: [
+        ":builtin_types.c",
+        "glsl_types.c",
+        "shader_enums.c",
+    ],
+}

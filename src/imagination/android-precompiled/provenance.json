@@ -1,0 +1,9 @@
+{
+  "upstream_revision": "9acc3e3aceb6addc499ee74b62021ee8e17ec34e",
+  "validated_mesa_revision": "2d5c5aa8da13f1574f6653e52d2a33421003aabb",
+  "validated_driver_sha256": "3dfb22731d3d84996bf01bb3325cdc640fcd1f7150633be5773058e0d2ae3d58",
+  "generator_build": "android-subvector-r1-build",
+  "imagination_uscgen_devices": [],
+  "imagination_srv": false,
+  "converter_revision": "ef04015b87f27b6ce62e754fdbdddf4a4969fa1a"
+}

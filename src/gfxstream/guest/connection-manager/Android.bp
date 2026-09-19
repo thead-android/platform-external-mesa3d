@@ -1,0 +1,287 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_library_headers {
+    name: "inc_connection_manager",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "connection_manager_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "connection_manager_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        default: [],
+    }),
+}
+
+cc_library_static {
+    name: "connection_manager",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_c",
+        "_trial_msvc",
+        "_trial_soong_c",
+        "_trial_soong_cpp",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "connection_manager_c_flags",
+        "connection_manager_cpp_flags",
+        "gfxstream_guest_args",
+        "vulkan_wsi_list",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_aemu",
+            "inc_connection_manager",
+            "inc_goldfish_address_space",
+            "inc_guest_iostream",
+            "inc_include",
+            "inc_platform_virtgpu",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86_64": [
+            "inc_aemu",
+            "inc_connection_manager",
+            "inc_goldfish_address_space",
+            "inc_guest_iostream",
+            "inc_include",
+            "inc_platform_virtgpu",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86": [
+            "inc_aemu",
+            "inc_connection_manager",
+            "inc_goldfish_address_space",
+            "inc_guest_iostream",
+            "inc_include",
+            "inc_platform_virtgpu",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86_64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86", "android"): [
+            "hwvulkan_headers",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select(arch(), {
+        "arm64": [
+            "GfxStreamConnection.cpp",
+            "GfxStreamConnectionManager.cpp",
+            "VirtioGpuPipeStream.cpp",
+        ],
+        "x86_64": [
+            "GfxStreamConnection.cpp",
+            "GfxStreamConnectionManager.cpp",
+            "VirtioGpuPipeStream.cpp",
+        ],
+        "x86": [
+            "GfxStreamConnection.cpp",
+            "GfxStreamConnectionManager.cpp",
+            "VirtioGpuPipeStream.cpp",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "QemuPipeStream.cpp",
+        ],
+        ("x86_64", "android"): [
+            "QemuPipeStream.cpp",
+        ],
+        ("x86", "android"): [
+            "QemuPipeStream.cpp",
+        ],
+        ("x86_64", "linux_glibc"): [
+            "QemuPipeStreamStub.cpp",
+        ],
+        ("x86_64", "linux_musl"): [
+            "QemuPipeStreamStub.cpp",
+        ],
+        ("arm64", "linux_musl"): [
+            "QemuPipeStreamStub.cpp",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select(arch(), {
+        "arm64": [
+            "blake3",
+            "gfxstream_vulkan_mapper",
+            "goldfish_address_space",
+            "libqemupipe.ranchu",
+            "libvirtgpu_kumquat_ffi",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "platform_virtgpu",
+            "platform_virtgpu_drm",
+            "platform_virtgpu_kumquat",
+            "vulkan_util",
+        ],
+        "x86_64": [
+            "blake3",
+            "gfxstream_vulkan_mapper",
+            "goldfish_address_space",
+            "libqemupipe.ranchu",
+            "libvirtgpu_kumquat_ffi",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "platform_virtgpu",
+            "platform_virtgpu_drm",
+            "platform_virtgpu_kumquat",
+            "vulkan_util",
+        ],
+        "x86": [
+            "blake3",
+            "gfxstream_vulkan_mapper",
+            "goldfish_address_space",
+            "libqemupipe.ranchu",
+            "libvirtgpu_kumquat_ffi",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "platform_virtgpu",
+            "platform_virtgpu_drm",
+            "platform_virtgpu_kumquat",
+            "vulkan_util",
+        ],
+        default: [],
+    }) + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }),
+    shared_libs: select(arch(), {
+        "arm64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86_64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86_64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        (default, default): [],
+    }),
+}

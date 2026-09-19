@@ -122,3 +122,7 @@ bindgen = { version = "1.71" }
 bison = { version = "3.8.2" }
 flex = { version = "2.6.4" }
 m4 = { version = "1.4.19" }
+mesa_clc = { version = "26.3.0" }
+vtn_bindgen2 = { version = "26.3.0" }
+pco_clc = { version = "26.3.0" }
+pdsc_precomp = { version = "26.3.0" }

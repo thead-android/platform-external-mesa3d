@@ -1,0 +1,37 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "libfreedreno_drm_msm_files",
+    srcs: [
+        "msm_bo.c",
+        "msm_device.c",
+        "msm_pipe.c",
+        "msm_ringbuffer.c",
+        "msm_ringbuffer_sp.c",
+    ],
+}
+
+cc_library_headers {
+    name: "inc_src_freedreno_drm_msm",
+    vendor: true,
+    export_include_dirs: select((arch(), os()), {
+        ("arm64", "android"): [
+            ".",
+        ],
+        (default, default): [],
+    }),
+}

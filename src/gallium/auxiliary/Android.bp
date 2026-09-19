@@ -1,0 +1,1087 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+genrule {
+    name: "draw_nir_lower_opcodes.c",
+    out: [
+        "draw_nir_lower_opcodes.c",
+    ],
+    tools: [
+        "draw_nir_lower_opcodes_py_binary",
+    ],
+    cmd: "$(location draw_nir_lower_opcodes_py_binary) -p " +
+        "$(genDir)/src/compiler/nir/ > $(location draw_nir_lower_opcodes.c)",
+}
+
+genrule {
+    name: "lp_bld_nir_no_integer_algebraic.c",
+    out: [
+        "lp_bld_nir_no_integer_algebraic.c",
+    ],
+    tools: [
+        "lp_bld_nir_no_integer_algebraic_py_binary",
+    ],
+    cmd: "$(location lp_bld_nir_no_integer_algebraic_py_binary) -p " +
+        "$(genDir)/src/compiler/nir/ > $(location " +
+        "lp_bld_nir_no_integer_algebraic.c)",
+}
+
+genrule {
+    name: "tr_util.ch_headers",
+    out: [
+        "src/gallium/auxiliary/tr_util.h",
+    ],
+    srcs: [
+        ":blend_h",
+        ":p_defines_h",
+        ":p_video_enums_h",
+    ],
+    tools: [
+        "enums2names_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/gallium",
+        "src/gallium/auxiliary",
+    ],
+    cmd: "$(location enums2names_py_binary) $(location :p_defines_h) $(location " +
+        ":p_video_enums_h) $(location :blend_h) -C " +
+        "$(genDir)/src/gallium/auxiliary/tr_util.c -H $(location " +
+        "src/gallium/auxiliary/tr_util.h)",
+}
+
+genrule {
+    name: "tr_util.ch_impl",
+    out: [
+        "src/gallium/auxiliary/tr_util.c",
+    ],
+    srcs: [
+        ":blend_h",
+        ":p_defines_h",
+        ":p_video_enums_h",
+    ],
+    tools: [
+        "enums2names_py_binary",
+    ],
+    cmd: "$(location enums2names_py_binary) $(location :p_defines_h) $(location " +
+        ":p_video_enums_h) $(location :blend_h) -C $(location " +
+        "src/gallium/auxiliary/tr_util.c) -H " +
+        "$(genDir)/src/gallium/auxiliary/tr_util.h",
+}
+
+genrule {
+    name: "u_indices_gen.c",
+    out: [
+        "u_indices_gen.c",
+    ],
+    tools: [
+        "u_indices_py_binary",
+    ],
+    cmd: "$(location u_indices_py_binary) $(location u_indices_gen.c)",
+}
+
+genrule {
+    name: "u_tracepoints.c",
+    out: [
+        "u_tracepoints.c",
+    ],
+    tools: [
+        "u_tracepoints_py_binary",
+    ],
+    cmd: "$(location u_tracepoints_py_binary) -p $(genDir)/src/util/perf/ -C " +
+        "$(location u_tracepoints.c)",
+}
+
+genrule {
+    name: "u_tracepoints.h",
+    out: [
+        "src/gallium/auxiliary/u_tracepoints.h",
+    ],
+    tools: [
+        "u_tracepoints_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/gallium",
+        "src/gallium/auxiliary",
+    ],
+    cmd: "$(location u_tracepoints_py_binary) -p $(genDir)/src/util/perf/ -H " +
+        "$(location src/gallium/auxiliary/u_tracepoints.h)",
+}
+
+genrule {
+    name: "u_unfilled_gen.c",
+    out: [
+        "u_unfilled_gen.c",
+    ],
+    tools: [
+        "u_unfilled_py_binary",
+    ],
+    cmd: "$(location u_unfilled_py_binary) $(location u_unfilled_gen.c)",
+}
+
+cc_library_headers {
+    name: "inc_gallium_aux",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "gallium_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "gallium_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "galliumvl_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "galliumvl_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "galliumvl_stub_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "galliumvl_stub_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "galliumvlwinsys_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "galliumvlwinsys_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: select(arch(), {
+        "arm64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86_64": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        "x86": [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+        ],
+        default: [],
+    }),
+}
+
+cc_library_static {
+    name: "gallium",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "gallium_c_flags",
+        "gallium_cpp_flags",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_compiler",
+            "inc_gallium",
+            "inc_include",
+            "inc_loader",
+            "inc_nir",
+            "inc_src",
+            "inc_src_gallium_auxiliary",
+            "inc_src_gallium_auxiliary_cso_cache",
+            "inc_src_gallium_auxiliary_draw",
+            "inc_src_gallium_auxiliary_driver_ddebug",
+            "inc_src_gallium_auxiliary_driver_noop",
+            "inc_src_gallium_auxiliary_driver_trace",
+            "inc_src_gallium_auxiliary_gallivm",
+            "inc_src_gallium_auxiliary_hud",
+            "inc_src_gallium_auxiliary_indices",
+            "inc_src_gallium_auxiliary_nir",
+            "inc_src_gallium_auxiliary_pipebuffer",
+            "inc_src_gallium_auxiliary_renderonly",
+            "inc_src_gallium_auxiliary_rtasm",
+            "inc_src_gallium_auxiliary_tessellator",
+            "inc_src_gallium_auxiliary_tgsi",
+            "inc_src_gallium_auxiliary_translate",
+            "inc_src_gallium_auxiliary_util",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86_64": [
+            "inc_compiler",
+            "inc_gallium",
+            "inc_include",
+            "inc_loader",
+            "inc_nir",
+            "inc_src",
+            "inc_src_gallium_auxiliary",
+            "inc_src_gallium_auxiliary_cso_cache",
+            "inc_src_gallium_auxiliary_draw",
+            "inc_src_gallium_auxiliary_driver_ddebug",
+            "inc_src_gallium_auxiliary_driver_noop",
+            "inc_src_gallium_auxiliary_driver_trace",
+            "inc_src_gallium_auxiliary_gallivm",
+            "inc_src_gallium_auxiliary_hud",
+            "inc_src_gallium_auxiliary_indices",
+            "inc_src_gallium_auxiliary_nir",
+            "inc_src_gallium_auxiliary_pipebuffer",
+            "inc_src_gallium_auxiliary_renderonly",
+            "inc_src_gallium_auxiliary_rtasm",
+            "inc_src_gallium_auxiliary_tessellator",
+            "inc_src_gallium_auxiliary_tgsi",
+            "inc_src_gallium_auxiliary_translate",
+            "inc_src_gallium_auxiliary_util",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86": [
+            "inc_compiler",
+            "inc_gallium",
+            "inc_include",
+            "inc_loader",
+            "inc_nir",
+            "inc_src",
+            "inc_src_gallium_auxiliary",
+            "inc_src_gallium_auxiliary_cso_cache",
+            "inc_src_gallium_auxiliary_draw",
+            "inc_src_gallium_auxiliary_driver_ddebug",
+            "inc_src_gallium_auxiliary_driver_noop",
+            "inc_src_gallium_auxiliary_driver_trace",
+            "inc_src_gallium_auxiliary_gallivm",
+            "inc_src_gallium_auxiliary_hud",
+            "inc_src_gallium_auxiliary_indices",
+            "inc_src_gallium_auxiliary_nir",
+            "inc_src_gallium_auxiliary_pipebuffer",
+            "inc_src_gallium_auxiliary_renderonly",
+            "inc_src_gallium_auxiliary_rtasm",
+            "inc_src_gallium_auxiliary_tessellator",
+            "inc_src_gallium_auxiliary_tgsi",
+            "inc_src_gallium_auxiliary_translate",
+            "inc_src_gallium_auxiliary_util",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86_64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86", "android"): [
+            "hwvulkan_headers",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "ir_expression_operation.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "shader_stats.h",
+        "tr_util.ch_headers",
+        "u_format_gen.h",
+        "u_tracepoints.h",
+    ],
+    srcs: select(arch(), {
+        "arm64": [
+            ":draw_nir_lower_opcodes.c",
+            ":files_libgallium",
+            ":files_libgallium_1",
+            ":files_libgallium_10",
+            ":files_libgallium_11",
+            ":files_libgallium_12",
+            ":files_libgallium_13",
+            ":files_libgallium_14",
+            ":files_libgallium_15",
+            ":files_libgallium_2",
+            ":files_libgallium_3",
+            ":files_libgallium_4",
+            ":files_libgallium_5",
+            ":files_libgallium_6",
+            ":files_libgallium_7",
+            ":files_libgallium_8",
+            ":files_libgallium_9",
+            ":lp_bld_nir_no_integer_algebraic.c",
+            ":tr_util.ch_impl",
+            ":u_indices_gen.c",
+            ":u_tracepoints.c",
+            ":u_unfilled_gen.c",
+        ],
+        "x86_64": [
+            ":draw_nir_lower_opcodes.c",
+            ":files_libgallium",
+            ":files_libgallium_1",
+            ":files_libgallium_10",
+            ":files_libgallium_11",
+            ":files_libgallium_12",
+            ":files_libgallium_13",
+            ":files_libgallium_14",
+            ":files_libgallium_15",
+            ":files_libgallium_2",
+            ":files_libgallium_3",
+            ":files_libgallium_4",
+            ":files_libgallium_5",
+            ":files_libgallium_6",
+            ":files_libgallium_7",
+            ":files_libgallium_8",
+            ":files_libgallium_9",
+            ":lp_bld_nir_no_integer_algebraic.c",
+            ":tr_util.ch_impl",
+            ":u_indices_gen.c",
+            ":u_tracepoints.c",
+            ":u_unfilled_gen.c",
+        ],
+        "x86": [
+            ":draw_nir_lower_opcodes.c",
+            ":files_libgallium",
+            ":files_libgallium_1",
+            ":files_libgallium_10",
+            ":files_libgallium_11",
+            ":files_libgallium_12",
+            ":files_libgallium_13",
+            ":files_libgallium_14",
+            ":files_libgallium_15",
+            ":files_libgallium_2",
+            ":files_libgallium_3",
+            ":files_libgallium_4",
+            ":files_libgallium_5",
+            ":files_libgallium_6",
+            ":files_libgallium_7",
+            ":files_libgallium_8",
+            ":files_libgallium_9",
+            ":lp_bld_nir_no_integer_algebraic.c",
+            ":tr_util.ch_impl",
+            ":u_indices_gen.c",
+            ":u_tracepoints.c",
+            ":u_unfilled_gen.c",
+        ],
+        default: [],
+    }),
+    static_libs: select(arch(), {
+        "arm64": [
+            "blake3",
+            "compiler",
+            "libLLVM16_swiftshader",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+        ],
+        "x86_64": [
+            "blake3",
+            "compiler",
+            "libLLVM16_swiftshader",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "nir",
+        ],
+        "x86": [
+            "blake3",
+            "compiler",
+            "libLLVM16_swiftshader",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "nir",
+        ],
+        default: [],
+    }) + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }),
+    shared_libs: select(arch(), {
+        "arm64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86_64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86_64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "galliumvl",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "galliumvl_c_flags",
+        "galliumvl_cpp_flags",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_compiler",
+            "inc_gallium",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_src_gallium_auxiliary_vl",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86_64": [
+            "inc_compiler",
+            "inc_gallium",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_src_gallium_auxiliary_vl",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86": [
+            "inc_compiler",
+            "inc_gallium",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_src_gallium_auxiliary_vl",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86_64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86", "android"): [
+            "hwvulkan_headers",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "ir_expression_operation.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select(arch(), {
+        "arm64": [
+            ":files_libgalliumvl",
+        ],
+        "x86_64": [
+            ":files_libgalliumvl",
+        ],
+        "x86": [
+            ":files_libgalliumvl",
+        ],
+        default: [],
+    }),
+    static_libs: select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "arm64": [
+            "blake3",
+            "compiler",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+        ],
+        "x86_64": [
+            "blake3",
+            "compiler",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "nir",
+        ],
+        "x86": [
+            "blake3",
+            "compiler",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+            "nir",
+        ],
+        default: [],
+    }),
+    shared_libs: select(arch(), {
+        "arm64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86_64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86_64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "galliumvl_stub",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "galliumvl_stub_c_flags",
+        "galliumvl_stub_cpp_flags",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_gallium",
+            "inc_include",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86_64": [
+            "inc_gallium",
+            "inc_include",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86": [
+            "inc_gallium",
+            "inc_include",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86_64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86", "android"): [
+            "hwvulkan_headers",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select(arch(), {
+        "arm64": [
+            ":galliumvl_stub_fg",
+        ],
+        "x86_64": [
+            ":galliumvl_stub_fg",
+        ],
+        "x86": [
+            ":galliumvl_stub_fg",
+        ],
+        default: [],
+    }),
+    static_libs: select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "arm64": [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+        ],
+        "x86_64": [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+        ],
+        "x86": [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+        ],
+        default: [],
+    }),
+    shared_libs: select(arch(), {
+        "arm64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86_64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86_64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "galliumvlwinsys",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "galliumvlwinsys_c_flags",
+        "galliumvlwinsys_cpp_flags",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_gallium",
+            "inc_include",
+            "inc_loader",
+            "inc_src",
+            "inc_src_gallium_auxiliary",
+            "inc_src_gallium_auxiliary_vl",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86_64": [
+            "inc_gallium",
+            "inc_include",
+            "inc_loader",
+            "inc_src",
+            "inc_src_gallium_auxiliary",
+            "inc_src_gallium_auxiliary_vl",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        "x86": [
+            "inc_gallium",
+            "inc_include",
+            "inc_loader",
+            "inc_src",
+            "inc_src_gallium_auxiliary",
+            "inc_src_gallium_auxiliary_vl",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86_64", "android"): [
+            "hwvulkan_headers",
+        ],
+        ("x86", "android"): [
+            "hwvulkan_headers",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select(arch(), {
+        "arm64": [
+            ":files_libgalliumvlwinsys",
+        ],
+        "x86_64": [
+            ":files_libgalliumvlwinsys",
+        ],
+        "x86": [
+            ":files_libgalliumvlwinsys",
+        ],
+        default: [],
+    }),
+    static_libs: select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "arm64": [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+        ],
+        "x86_64": [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+        ],
+        "x86": [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+            "mesa_util_simd",
+        ],
+        default: [],
+    }),
+    shared_libs: select(arch(), {
+        "arm64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86_64": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        "x86": [
+            "libdrm",
+            "libz",
+            "libzstd",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86_64", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        ("x86", "android"): [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        (default, default): [],
+    }),
+}

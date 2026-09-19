@@ -1,0 +1,2675 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "adreno_pm4_xml",
+    srcs: [
+        "adreno_pm4.xml",
+    ],
+}
+
+filegroup {
+    name: "xml_files",
+    srcs: [
+        "a6xx_gmu.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "ocmem.xml",
+    ],
+}
+
+filegroup {
+    name: "xml_reg_files",
+    srcs: [
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+    ],
+}
+
+genrule {
+    name: "a2xx.py",
+    out: [
+        "a2xx.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a2xx.xml) py-defines > $(location a2xx.py)",
+}
+
+genrule {
+    name: "a2xx.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a2xx.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a2xx.xml) c-defines " +
+        "> $(location src/freedreno/registers/adreno/a2xx.xml.h)",
+}
+
+genrule {
+    name: "a2xx_perfcntrs.json.h",
+    out: [
+        "src/freedreno/registers/adreno/a2xx_perfcntrs.json.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a2xx_perfcntrs.json",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a2xx.xml) perfcntrs " +
+        "--json $(location a2xx_perfcntrs.json) > $(location " +
+        "src/freedreno/registers/adreno/a2xx_perfcntrs.json.h)",
+}
+
+genrule {
+    name: "a3xx.py",
+    out: [
+        "a3xx.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a3xx.xml) py-defines > $(location a3xx.py)",
+}
+
+genrule {
+    name: "a3xx.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a3xx.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a3xx.xml) c-defines " +
+        "> $(location src/freedreno/registers/adreno/a3xx.xml.h)",
+}
+
+genrule {
+    name: "a4xx.py",
+    out: [
+        "a4xx.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a4xx.xml) py-defines > $(location a4xx.py)",
+}
+
+genrule {
+    name: "a4xx.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a4xx.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a4xx.xml) c-defines " +
+        "> $(location src/freedreno/registers/adreno/a4xx.xml.h)",
+}
+
+genrule {
+    name: "a5xx.py",
+    out: [
+        "a5xx.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a5xx.xml) py-defines > $(location a5xx.py)",
+}
+
+genrule {
+    name: "a5xx.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a5xx.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a5xx.xml) c-defines " +
+        "> $(location src/freedreno/registers/adreno/a5xx.xml.h)",
+}
+
+genrule {
+    name: "a5xx_perfcntrs.json.h",
+    out: [
+        "src/freedreno/registers/adreno/a5xx_perfcntrs.json.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a5xx_perfcntrs.json",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a5xx.xml) perfcntrs " +
+        "--json $(location a5xx_perfcntrs.json) > $(location " +
+        "src/freedreno/registers/adreno/a5xx_perfcntrs.json.h)",
+}
+
+genrule {
+    name: "a6xx-pack.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx-pack.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a6xx.xml) c-pack-structs > $(location " +
+        "src/freedreno/registers/adreno/a6xx-pack.xml.h)",
+}
+
+genrule {
+    name: "a6xx.py",
+    out: [
+        "a6xx.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a6xx.xml) py-defines > $(location a6xx.py)",
+}
+
+genrule {
+    name: "a6xx.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx.xml) c-defines " +
+        "> $(location src/freedreno/registers/adreno/a6xx.xml.h)",
+}
+
+genrule {
+    name: "a6xx_descriptors.py",
+    out: [
+        "a6xx_descriptors.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a6xx_descriptors.xml) py-defines > $(location " +
+        "a6xx_descriptors.py)",
+}
+
+genrule {
+    name: "a6xx_descriptors.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx_descriptors.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location " +
+        "a6xx_descriptors.xml) c-defines > $(location " +
+        "src/freedreno/registers/adreno/a6xx_descriptors.xml.h)",
+}
+
+genrule {
+    name: "a6xx_enums.py",
+    out: [
+        "a6xx_enums.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a6xx_enums.xml) py-defines > $(location a6xx_enums.py)",
+}
+
+genrule {
+    name: "a6xx_enums.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx_enums.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx_enums.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/a6xx_enums.xml.h)",
+}
+
+genrule {
+    name: "a6xx_gmu.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx_gmu.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx_gmu.xml) " +
+        "c-defines > $(location src/freedreno/registers/adreno/a6xx_gmu.xml.h)",
+}
+
+genrule {
+    name: "a6xx_perfcntrs.json.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx_perfcntrs.json.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.json",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx.xml) perfcntrs " +
+        "--json $(location a6xx_perfcntrs.json) > $(location " +
+        "src/freedreno/registers/adreno/a6xx_perfcntrs.json.h)",
+}
+
+genrule {
+    name: "a6xx_perfcntrs.py",
+    out: [
+        "a6xx_perfcntrs.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a6xx_perfcntrs.xml) py-defines > $(location " +
+        "a6xx_perfcntrs.py)",
+}
+
+genrule {
+    name: "a6xx_perfcntrs.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a6xx_perfcntrs.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx_perfcntrs.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/a6xx_perfcntrs.xml.h)",
+}
+
+genrule {
+    name: "a7xx_enums.py",
+    out: [
+        "a7xx_enums.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a7xx_enums.xml) py-defines > $(location a7xx_enums.py)",
+}
+
+genrule {
+    name: "a7xx_enums.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a7xx_enums.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a7xx_enums.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/a7xx_enums.xml.h)",
+}
+
+genrule {
+    name: "a7xx_perfcntrs.json.h",
+    out: [
+        "src/freedreno/registers/adreno/a7xx_perfcntrs.json.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.json",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx.xml) perfcntrs " +
+        "--json $(location a7xx_perfcntrs.json) > $(location " +
+        "src/freedreno/registers/adreno/a7xx_perfcntrs.json.h)",
+}
+
+genrule {
+    name: "a7xx_perfcntrs.py",
+    out: [
+        "a7xx_perfcntrs.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a8xx_enums.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_descriptors.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a7xx_perfcntrs.xml) py-defines > $(location " +
+        "a7xx_perfcntrs.py)",
+}
+
+genrule {
+    name: "a7xx_perfcntrs.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a7xx_perfcntrs.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a8xx_enums.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_descriptors.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a7xx_perfcntrs.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/a7xx_perfcntrs.xml.h)",
+}
+
+genrule {
+    name: "a8xx_descriptors.py",
+    out: [
+        "a8xx_descriptors.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a8xx_descriptors.xml) py-defines > $(location " +
+        "a8xx_descriptors.py)",
+}
+
+genrule {
+    name: "a8xx_descriptors.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a8xx_descriptors.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location " +
+        "a8xx_descriptors.xml) c-defines > $(location " +
+        "src/freedreno/registers/adreno/a8xx_descriptors.xml.h)",
+}
+
+genrule {
+    name: "a8xx_enums.py",
+    out: [
+        "a8xx_enums.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_descriptors.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a8xx_enums.xml) py-defines > $(location a8xx_enums.py)",
+}
+
+genrule {
+    name: "a8xx_enums.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a8xx_enums.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_descriptors.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a8xx_enums.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/a8xx_enums.xml.h)",
+}
+
+genrule {
+    name: "a8xx_perfcntrs.json.h",
+    out: [
+        "src/freedreno/registers/adreno/a8xx_perfcntrs.json.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.json",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a6xx.xml) perfcntrs " +
+        "--json $(location a8xx_perfcntrs.json) > $(location " +
+        "src/freedreno/registers/adreno/a8xx_perfcntrs.json.h)",
+}
+
+genrule {
+    name: "a8xx_perfcntrs.py",
+    out: [
+        "a8xx_perfcntrs.py",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location a8xx_perfcntrs.xml) py-defines > $(location " +
+        "a8xx_perfcntrs.py)",
+}
+
+genrule {
+    name: "a8xx_perfcntrs.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/a8xx_perfcntrs.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location a8xx_perfcntrs.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/a8xx_perfcntrs.xml.h)",
+}
+
+genrule {
+    name: "adreno-pm4-pack.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/adreno-pm4-pack.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location adreno_pm4.xml) c-pack-structs > $(location " +
+        "src/freedreno/registers/adreno/adreno-pm4-pack.xml.h)",
+}
+
+genrule {
+    name: "adreno_common.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/adreno_common.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& $(location gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location adreno_common.xml) " +
+        "c-defines > $(location " +
+        "src/freedreno/registers/adreno/adreno_common.xml.h)",
+}
+
+genrule {
+    name: "adreno_control_regs.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/adreno_control_regs.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_pipe_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_common.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& $(location gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location " +
+        "adreno_control_regs.xml) c-defines > $(location " +
+        "src/freedreno/registers/adreno/adreno_control_regs.xml.h)",
+}
+
+genrule {
+    name: "adreno_pipe_regs.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/adreno_pipe_regs.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_common.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& $(location gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location " +
+        "adreno_pipe_regs.xml) c-defines > $(location " +
+        "src/freedreno/registers/adreno/adreno_pipe_regs.xml.h)",
+}
+
+genrule {
+    name: "adreno_pm4.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/adreno_pm4.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations ocmem.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --rnn $(genDir)/src/freedreno/registers --xml " +
+        "$(location adreno_pm4.xml) c-defines > $(location " +
+        "src/freedreno/registers/adreno/adreno_pm4.xml.h)",
+}
+
+genrule {
+    name: "ocmem.xml.h",
+    out: [
+        "src/freedreno/registers/adreno/ocmem.xml.h",
+    ],
+    srcs: [
+        ":freedreno_copyright",
+        ":freedreno_schema",
+        "a2xx.xml",
+        "a3xx.xml",
+        "a4xx.xml",
+        "a5xx.xml",
+        "a6xx.xml",
+        "a6xx_descriptors.xml",
+        "a6xx_enums.xml",
+        "a6xx_gmu.xml",
+        "a6xx_perfcntrs.xml",
+        "a7xx_enums.xml",
+        "a7xx_perfcntrs.xml",
+        "a8xx_descriptors.xml",
+        "a8xx_enums.xml",
+        "a8xx_perfcntrs.xml",
+        "adreno_common.xml",
+        "adreno_control_regs.xml",
+        "adreno_pipe_regs.xml",
+        "adreno_pm4.xml",
+        "ocmem.xml",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+        "src/freedreno/registers/adreno",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        ":freedreno_schema) $(genDir)/src/freedreno/registers && cp $(locations " +
+        ":freedreno_copyright) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations a2xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a3xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a4xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a5xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a6xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a6xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a7xx_enums.xml) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations a7xx_perfcntrs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_enums.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a8xx_descriptors.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "a8xx_perfcntrs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations a6xx_gmu.xml) $(genDir)/src/freedreno/registers/adreno && " +
+        "cp $(locations adreno_control_regs.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pipe_regs.xml) $(genDir)/src/freedreno/registers/adreno && cp " +
+        "$(locations adreno_common.xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "adreno_pm4.xml) $(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location ocmem.xml) " +
+        "c-defines > $(location src/freedreno/registers/adreno/ocmem.xml.h)",
+}

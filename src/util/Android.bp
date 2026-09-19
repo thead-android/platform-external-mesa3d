@@ -1,0 +1,591 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "blend_h",
+    srcs: [
+        "blend.h",
+    ],
+}
+
+filegroup {
+    name: "drirc_gen.py",
+    srcs: [
+        "drirc_gen.py",
+    ],
+}
+
+python_binary_host {
+    name: "driconf_static_py_binary",
+    main: "driconf_static.py",
+    srcs: [
+        "driconf_static.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "format_srgb_py_binary",
+    main: "format_srgb.py",
+    srcs: [
+        "format_srgb.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "glsl2spirv_py_binary",
+    main: "glsl2spirv.py",
+    srcs: [
+        "glsl2spirv.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "process_shader_stats_py_binary",
+    main: "process_shader_stats.py",
+    srcs: [
+        "process_shader_stats.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "driconf_static.h",
+    out: [
+        "src/util/driconf_static.h",
+    ],
+    srcs: [
+        "00-mesa-defaults.conf",
+        ":files_drirc",
+    ],
+    tools: [
+        "driconf_static_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/util",
+    ],
+    cmd: "$(location driconf_static_py_binary) $(location 00-mesa-defaults.conf) " +
+        "$(location :files_drirc) $(location src/util/driconf_static.h)",
+}
+
+genrule {
+    name: "format_srgb",
+    out: [
+        "format_srgb.c",
+    ],
+    tools: [
+        "format_srgb_py_binary",
+    ],
+    cmd: "$(location format_srgb_py_binary) > $(location format_srgb.c)",
+}
+
+genrule {
+    name: "shader_stats.h",
+    out: [
+        "src/util/shader_stats.h",
+    ],
+    srcs: [
+        "shader_stats.rnc",
+        "shader_stats.xml",
+    ],
+    tools: [
+        "process_shader_stats_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/util",
+    ],
+    cmd: "$(location process_shader_stats_py_binary) $(location " +
+        "shader_stats.rnc) $(location shader_stats.xml) > $(location " +
+        "src/util/shader_stats.h)",
+}
+
+cc_defaults {
+    name: "c_xmlconfig_arg",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-DWITH_XMLCONFIG=0",
+    ],
+}
+
+cc_defaults {
+    name: "mesa_util_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "mesa_util_clflush_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "x86_64": [
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "mesa_util_clflushopt_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: select(arch(), {
+        "x86_64": [
+            "-fvisibility=hidden",
+        ],
+        "x86": [
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "mesa_util_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: [
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "mesa_util_simd_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "parson_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "xmlconfig_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-DDATADIR=\"/usr/local/share\"",
+        "-DSYSCONFDIR=\"/usr/local/etc\"",
+        "-DXXH_FORCE_ALIGN_CHECK=0",
+        "-DXXH_FORCE_MEMORY_ACCESS=0",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_defaults {
+    name: "xmlconfig_cpp_flags",
+    vendor: true,
+    host_supported: true,
+    cppflags: [
+        "-DXXH_FORCE_ALIGN_CHECK=0",
+        "-DXXH_FORCE_MEMORY_ACCESS=0",
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_library_static {
+    name: "mesa_util",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "_trial_soong_c",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "mesa_util_c_flags",
+        "mesa_util_cpp_flags",
+    ],
+    header_libs: [
+        "inc_include",
+        "inc_src_util",
+        "inc_src_util_perf",
+        "inc_util",
+        "inc_util_c11",
+    ] + select(os(), {
+        "android": [
+            "hwvulkan_headers",
+        ],
+        default: [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+        "u_format_pack.h",
+    ],
+    srcs: [
+        ":files_mesa_format",
+        ":files_mesa_util",
+        ":format_srgb",
+        ":u_format_table.c",
+        "anon_file.c",
+        "bitscan.c",
+        "blob.c",
+        "build_id.c",
+        "cnd_monotonic.c",
+        "compress.c",
+        "crc32.c",
+        "dag.c",
+        "disk_cache.c",
+        "disk_cache_os.c",
+        "double.c",
+        "fast_idiv_by_const.c",
+        "float8.c",
+        "fossilize_db.c",
+        "futex.c",
+        "half_float.c",
+        "hash_table.c",
+        "helpers.c",
+        "log.c",
+        "lut.c",
+        "memstream.c",
+        "mesa-blake3.c",
+        "mesa_cache_db.c",
+        "mesa_cache_db_multipart.c",
+        "os_file.c",
+        "os_file_notify.c",
+        "os_memory_fd.c",
+        "os_misc.c",
+        "os_socket.c",
+        "os_time.c",
+        "pb_slab.c",
+        "ralloc.c",
+        "rand_xor.c",
+        "range_minimum_query.c",
+        "rb_tree.c",
+        "register_allocate.c",
+        "rgtc.c",
+        "rwlock.c",
+        "set.c",
+        "simple_mtx.c",
+        "slab.c",
+        "softfloat.c",
+        "sparse_array.c",
+        "string_buffer.c",
+        "strndup.c",
+        "strtod.c",
+        "texcompress_astc.cpp",
+        "texcompress_astc_luts.cpp",
+        "texcompress_astc_luts_wrap.cpp",
+        "thread_sched.c",
+        "u_atomic.c",
+        "u_call_once.c",
+        "u_cpu_detect.c",
+        "u_debug.c",
+        "u_debug_memory.c",
+        "u_dl.c",
+        "u_dynarray.c",
+        "u_hash_table.c",
+        "u_idalloc.c",
+        "u_math.c",
+        "u_mm.c",
+        "u_printf.c",
+        "u_process.c",
+        "u_qsort.cpp",
+        "u_queue.c",
+        "u_range_remap.c",
+        "u_shader_variant_cache.c",
+        "u_string.c",
+        "u_sync_provider.c",
+        "u_thread.c",
+        "u_vector.c",
+        "u_worklist.c",
+        "vl_zscan_data.c",
+        "vma.c",
+    ] + select((arch(), os()), {
+        ("arm64", "android"): [
+            "cache_ops_aarch64.c",
+        ],
+        ("arm64", "linux_musl"): [
+            "cache_ops_aarch64.c",
+            "u_debug_stack.c",
+            "u_debug_symbol.c",
+        ],
+        ("x86_64", "linux_glibc"): [
+            "u_debug_stack.c",
+            "u_debug_symbol.c",
+        ],
+        ("x86_64", "linux_musl"): [
+            "u_debug_stack.c",
+            "u_debug_symbol.c",
+        ],
+        ("riscv64", "android"): [
+            "cache_ops_null.c",
+        ],
+        (default, default): [],
+    }) + select(os(), {
+        "android": [
+            "u_debug_stack_android.cpp",
+        ],
+        default: [],
+    }),
+    static_libs: [
+        "blake3",
+        "mesa_util_c11",
+        "mesa_util_simd",
+    ] + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "x86_64": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        "x86": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        default: [],
+    }),
+    shared_libs: [
+        "libdrm",
+        "libz",
+        "libzstd",
+    ] + select(os(), {
+        "android": [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        default: [],
+    }),
+}
+
+cc_library_static {
+    name: "mesa_util_clflush",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "mesa_util_clflush_c_flags",
+        "no_override_init_args",
+    ],
+    header_libs: select(arch(), {
+        "x86_64": [
+            "inc_include",
+            "inc_util",
+        ],
+        "x86": [
+            "inc_include",
+            "inc_util",
+        ],
+        default: [],
+    }),
+    srcs: select(arch(), {
+        "x86_64": [
+            "cache_ops_x86.c",
+        ],
+        "x86": [
+            "cache_ops_x86.c",
+        ],
+        default: [],
+    }),
+}
+
+cc_library_static {
+    name: "mesa_util_clflushopt",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "clflushopt_args",
+        "mesa_util_clflushopt_c_flags",
+        "no_override_init_args",
+    ],
+    header_libs: select(arch(), {
+        "x86_64": [
+            "inc_include",
+            "inc_util",
+        ],
+        "x86": [
+            "inc_include",
+            "inc_util",
+        ],
+        default: [],
+    }),
+    srcs: select(arch(), {
+        "x86_64": [
+            "cache_ops_x86_clflushopt.c",
+        ],
+        "x86": [
+            "cache_ops_x86_clflushopt.c",
+        ],
+        default: [],
+    }),
+}
+
+cc_library_static {
+    name: "mesa_util_simd",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "_trial_soong_c",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "mesa_util_simd_c_flags",
+        "sse41_args",
+    ],
+    header_libs: [
+        "inc_include",
+        "inc_util",
+    ],
+    srcs: [
+        "streaming-load-memcpy.c",
+    ],
+}
+
+cc_library_static {
+    name: "parson",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "parson_c_flags",
+    ],
+    srcs: [
+        "parson.c",
+    ],
+}
+
+cc_library_static {
+    name: "xmlconfig",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "_trial_soong_c",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "c_xmlconfig_arg",
+        "xmlconfig_c_flags",
+        "xmlconfig_cpp_flags",
+    ],
+    header_libs: [
+        "inc_include",
+        "inc_util",
+        "inc_util_c11",
+    ] + select(os(), {
+        "android": [
+            "hwvulkan_headers",
+        ],
+        default: [],
+    }),
+    generated_headers: [
+        "driconf_static.h",
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: [
+        "xmlconfig.c",
+    ],
+    static_libs: [
+        "blake3",
+        "mesa_util",
+        "mesa_util_c11",
+        "mesa_util_simd",
+    ] + select((arch(), os(), soong_config_variable("aosp_mesa3d", "perfetto")), {
+        ("arm64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86_64", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        ("x86", "android", "true"): [
+            "libperfetto_client_experimental",
+        ],
+        (default, default, default): [],
+    }) + select(arch(), {
+        "x86_64": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        "x86": [
+            "mesa_util_clflush",
+            "mesa_util_clflushopt",
+        ],
+        default: [],
+    }),
+    shared_libs: [
+        "libdrm",
+        "libz",
+        "libzstd",
+    ] + select(os(), {
+        "android": [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+        ],
+        default: [],
+    }),
+}

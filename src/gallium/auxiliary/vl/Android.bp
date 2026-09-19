@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_libgalliumvl",
+    srcs: [
+        "vl_codec.c",
+        "vl_compositor.c",
+        "vl_compositor_cs.c",
+        "vl_compositor_gfx.c",
+        "vl_compositor_proc.c",
+        "vl_csc.c",
+        "vl_deint_filter.c",
+        "vl_deint_filter_cs.c",
+        "vl_mpeg12_bitstream.c",
+        "vl_proc.c",
+        "vl_vertex_buffers.c",
+        "vl_video_buffer.c",
+    ],
+}
+
+filegroup {
+    name: "files_libgalliumvlwinsys",
+    srcs: [
+        "vl_winsys_drm.c",
+    ],
+}
+
+filegroup {
+    name: "galliumvl_stub_fg",
+    srcs: [
+        "vl_stubs.c",
+    ],
+}
+
+cc_library_headers {
+    name: "inc_src_gallium_auxiliary_vl",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}

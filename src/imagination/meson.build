@@ -11,6 +11,10 @@ inc_imagination = include_directories([
   'include',
 ])
 
+if get_option('imagination-android-precompiled')
+  inc_imagination = [inc_imagination, include_directories('android-precompiled')]
+endif
+
 if with_imagination_vk or with_tools.contains('imagination')
   subdir('common')
   subdir('csbgen')

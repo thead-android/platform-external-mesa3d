@@ -1,0 +1,75 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "freedreno_copyright",
+    srcs: [
+        "freedreno_copyright.xml",
+    ],
+}
+
+filegroup {
+    name: "freedreno_schema",
+    srcs: [
+        "rules-fd.xsd",
+    ],
+}
+
+python_binary_host {
+    name: "gen_header_py_binary",
+    main: "gen_header.py",
+    srcs: [
+        "gen_header.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "adreno.xml.h",
+    out: [
+        "src/freedreno/registers/adreno.xml.h",
+    ],
+    srcs: [
+        ":adreno_pm4_xml",
+        ":xml_files",
+        ":xml_reg_files",
+        "adreno.xml",
+        "freedreno_copyright.xml",
+        "rules-fd.xsd",
+    ],
+    tools: [
+        "gen_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/registers",
+    ],
+    cmd: "mkdir -p $(genDir)/src/freedreno/registers && mkdir -p " +
+        "$(genDir)/src/freedreno/registers/adreno && cp $(locations " +
+        "rules-fd.xsd) $(genDir)/src/freedreno/registers && cp $(locations " +
+        "freedreno_copyright.xml) $(genDir)/src/freedreno/registers && cp " +
+        "$(locations :xml_reg_files) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations :xml_files) $(genDir)/src/freedreno/registers/adreno " +
+        "&& cp $(locations :adreno_pm4_xml) " +
+        "$(genDir)/src/freedreno/registers/adreno && $(location " +
+        "gen_header_py_binary) --validate --rnn " +
+        "$(genDir)/src/freedreno/registers --xml $(location adreno.xml) " +
+        "c-defines > $(location src/freedreno/registers/adreno.xml.h)",
+}

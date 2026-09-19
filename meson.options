@@ -248,6 +248,8 @@ option('imagination-uscgen-devices',
   description : 'List of devices for which to pre-build USC program binaries.',
 )
 
+option('imagination-android-precompiled', type : 'boolean', value : false)
+
 option(
   'shader-cache',
   type : 'feature',

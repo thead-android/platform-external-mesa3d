@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_libgallium_8",
+    srcs: [
+        "u_primconvert.c",
+    ],
+}
+
+python_binary_host {
+    name: "u_indices_py_binary",
+    main: "u_indices_gen.py",
+    srcs: [
+        "u_indices_gen.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+python_binary_host {
+    name: "u_unfilled_py_binary",
+    main: "u_unfilled_gen.py",
+    srcs: [
+        "u_unfilled_gen.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+cc_library_headers {
+    name: "inc_src_gallium_auxiliary_indices",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}

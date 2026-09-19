@@ -1,0 +1,350 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+genrule {
+    name: "encode.h",
+    out: [
+        "src/freedreno/isa/encode.h",
+    ],
+    srcs: [
+        "ir3-cat0.xml",
+        "ir3-cat1.xml",
+        "ir3-cat2.xml",
+        "ir3-cat3.xml",
+        "ir3-cat4.xml",
+        "ir3-cat5.xml",
+        "ir3-cat6.xml",
+        "ir3-cat7.xml",
+        "ir3-common.xml",
+        "ir3.xml",
+    ],
+    tools: [
+        "encode_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/isa",
+    ],
+    cmd: "$(location encode_py_binary) --xml $(location ir3.xml) --out-h " +
+        "$(location src/freedreno/isa/encode.h)",
+}
+
+genrule {
+    name: "ir3-isa_headers",
+    out: [
+        "src/freedreno/isa/ir3-isa.h",
+    ],
+    srcs: [
+        "ir3-cat0.xml",
+        "ir3-cat1.xml",
+        "ir3-cat2.xml",
+        "ir3-cat3.xml",
+        "ir3-cat4.xml",
+        "ir3-cat5.xml",
+        "ir3-cat6.xml",
+        "ir3-cat7.xml",
+        "ir3-common.xml",
+        "ir3.xml",
+    ],
+    tools: [
+        "decode_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/freedreno",
+        "src/freedreno/isa",
+    ],
+    cmd: "$(location decode_py_binary) --xml $(location ir3.xml) --out-c " +
+        "$(genDir)/src/freedreno/isa/ir3-isa.c --out-h $(location " +
+        "src/freedreno/isa/ir3-isa.h)",
+}
+
+genrule {
+    name: "ir3-isa_impl",
+    out: [
+        "src/freedreno/isa/ir3-isa.c",
+    ],
+    srcs: [
+        "ir3-cat0.xml",
+        "ir3-cat1.xml",
+        "ir3-cat2.xml",
+        "ir3-cat3.xml",
+        "ir3-cat4.xml",
+        "ir3-cat5.xml",
+        "ir3-cat6.xml",
+        "ir3-cat7.xml",
+        "ir3-common.xml",
+        "ir3.xml",
+    ],
+    tools: [
+        "decode_py_binary",
+    ],
+    cmd: "$(location decode_py_binary) --xml $(location ir3.xml) --out-c " +
+        "$(location src/freedreno/isa/ir3-isa.c) --out-h " +
+        "$(genDir)/src/freedreno/isa/ir3-isa.h",
+}
+
+cc_library_headers {
+    name: "inc_src_freedreno_isa",
+    vendor: true,
+    export_include_dirs: select((arch(), os()), {
+        ("arm64", "android"): [
+            ".",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "ir3decode_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "ir3decode_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "ir3encode_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "ir3encode_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "ir3decode",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "ir3decode_c_flags",
+        "ir3decode_cpp_flags",
+    ],
+    header_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+            "inc_include",
+            "inc_src",
+            "inc_src_compiler_isaspec",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "ir3-isa_headers",
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("arm64", "android"): [
+            ":ir3-isa_impl",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "blake3",
+            "isaspec",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "ir3encode",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "ir3encode_c_flags",
+        "ir3encode_cpp_flags",
+    ],
+    header_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "hwvulkan_headers",
+            "inc_compiler",
+            "inc_freedreno",
+            "inc_include",
+            "inc_nir",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "builtin_types.h",
+        "encode.h",
+        "ir_expression_operation.h",
+        "nir_builder_opcodes.h",
+        "nir_intrinsics.h",
+        "nir_intrinsics_indices.h",
+        "nir_opcodes.h",
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "encode.c",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "blake3",
+            "compiler",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+            "nir",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_binary {
+    name: "ir3-disasm",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    enabled: false,
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+    ],
+    header_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "inc_freedreno",
+            "inc_include",
+            "inc_src",
+            "inc_src_compiler_isaspec",
+            "inc_src_freedreno_isa",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "ir3-isa_headers",
+    ],
+    srcs: select((arch(), os()), {
+        ("arm64", "android"): [
+            ":ir3-isa_impl",
+            "ir3-disasm.c",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "blake3",
+            "freedreno_common",
+            "ir3decode",
+            "isaspec",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("arm64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+}

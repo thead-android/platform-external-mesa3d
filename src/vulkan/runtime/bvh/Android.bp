@@ -1,0 +1,468 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "vk_bvh_includes_1",
+    srcs: [
+        "leaf.h",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+}
+
+genrule {
+    name: "hploc_internal.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/hploc_internal.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "hploc_internal.comp",
+        "leaf.h",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/hploc_internal.spv.h) $(location " +
+        "hploc_internal.comp) --quiet '-P#extension GL_GOOGLE_include_directive " +
+        ": require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "id_prefix_sum.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/id_prefix_sum.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "id_prefix_sum.comp",
+        "leaf.h",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/id_prefix_sum.spv.h) $(location " +
+        "id_prefix_sum.comp) --quiet '-P#extension GL_GOOGLE_include_directive " +
+        ": require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "lbvh_generate_ir.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/lbvh_generate_ir.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "lbvh_generate_ir.comp",
+        "leaf.h",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/lbvh_generate_ir.spv.h) $(location " +
+        "lbvh_generate_ir.comp) --quiet '-P#extension " +
+        "GL_GOOGLE_include_directive : require' '-P#extension " +
+        "GL_EXT_control_flow_attributes : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int8 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int16 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int32 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int64 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_float16 : require' " +
+        "'-P#extension GL_EXT_scalar_block_layout : require' '-P#extension " +
+        "GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "lbvh_main.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/lbvh_main.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "lbvh_main.comp",
+        "leaf.h",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/lbvh_main.spv.h) $(location " +
+        "lbvh_main.comp) --quiet '-P#extension GL_GOOGLE_include_directive : " +
+        "require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "leaf.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/leaf.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "leaf.comp",
+        "leaf.h",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/leaf.spv.h) $(location leaf.comp) " +
+        "--quiet '-P#extension GL_GOOGLE_include_directive : require' " +
+        "'-P#extension GL_EXT_control_flow_attributes : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int8 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int16 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int32 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_int64 : require' '-P#extension " +
+        "GL_EXT_shader_explicit_arithmetic_types_float16 : require' " +
+        "'-P#extension GL_EXT_scalar_block_layout : require' '-P#extension " +
+        "GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "morton_sort_32.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/morton_sort_32.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "leaf.h",
+        "morton_sort.comp",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/morton_sort_32.spv.h) $(location " +
+        "morton_sort.comp) --quiet '-P#extension GL_GOOGLE_include_directive : " +
+        "require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "morton_sort_64.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/morton_sort_64.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "leaf.h",
+        "morton_sort.comp",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/morton_sort_64.spv.h) $(location " +
+        "morton_sort.comp) --quiet '-P#extension GL_GOOGLE_include_directive : " +
+        "require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require' -DMORTON_SORT_KEY64=1",
+}
+
+genrule {
+    name: "pair_triangles.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/pair_triangles.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "leaf.h",
+        "pair_triangles.comp",
+        "pair_triangles.h",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/pair_triangles.spv.h) $(location " +
+        "pair_triangles.comp) --quiet '-P#extension GL_GOOGLE_include_directive " +
+        ": require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}
+
+genrule {
+    name: "ploc_internal.spv.h",
+    out: [
+        "src/vulkan/runtime/bvh/ploc_internal.spv.h",
+    ],
+    srcs: [
+        ":vk_bvh_includes",
+        "leaf.h",
+        "pair_triangles.h",
+        "ploc_internal.comp",
+        "vk_bvh_defines.h",
+        "vk_bvh_helpers.h",
+        "vk_debug.h",
+    ],
+    tools: [
+        "glslangValidator",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/vulkan",
+        "src/vulkan/runtime",
+        "src/vulkan/runtime/bvh",
+    ],
+    cmd: "$(location glslangValidator) -V " +
+        "-Iexternal/mesa3d/src/vulkan/runtime/bvh " +
+        "-Iexternal/mesa3d/src/compiler/spirv --target-env spirv1.5 -x -o " +
+        "$(location src/vulkan/runtime/bvh/ploc_internal.spv.h) $(location " +
+        "ploc_internal.comp) --quiet '-P#extension GL_GOOGLE_include_directive " +
+        ": require' '-P#extension GL_EXT_control_flow_attributes : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int8 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int16 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int32 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require' " +
+        "'-P#extension GL_EXT_shader_explicit_arithmetic_types_float16 : " +
+        "require' '-P#extension GL_EXT_scalar_block_layout : require' " +
+        "'-P#extension GL_EXT_buffer_reference : require' '-P#extension " +
+        "GL_EXT_buffer_reference2 : require' '-P#extension " +
+        "GL_KHR_memory_scope_semantics : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_arithmetic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_basic : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_shuffle : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_ballot : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_clustered : require' '-P#extension " +
+        "GL_KHR_shader_subgroup_vote : require' '-P#extension " +
+        "GL_EXT_shader_atomic_int64 : require' '-P#extension " +
+        "GL_EXT_spirv_intrinsics : require' '-P#extension " +
+        "GL_EXT_shared_memory_block : require'",
+}

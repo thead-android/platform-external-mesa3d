@@ -1,0 +1,141 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+genrule {
+    name: "pvr_volcanic_cdm.h",
+    out: [
+        "src/imagination/csbgen/volcanic/cdm.h",
+    ],
+    srcs: [
+        "cdm.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/volcanic",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location cdm.xml) > $(location " +
+        "src/imagination/csbgen/volcanic/cdm.h)",
+}
+
+genrule {
+    name: "pvr_volcanic_ipf.h",
+    out: [
+        "src/imagination/csbgen/volcanic/ipf.h",
+    ],
+    srcs: [
+        "ipf.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/volcanic",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location ipf.xml) > $(location " +
+        "src/imagination/csbgen/volcanic/ipf.h)",
+}
+
+genrule {
+    name: "pvr_volcanic_lls.h",
+    out: [
+        "src/imagination/csbgen/volcanic/lls.h",
+    ],
+    srcs: [
+        "lls.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/volcanic",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location lls.xml) > $(location " +
+        "src/imagination/csbgen/volcanic/lls.h)",
+}
+
+genrule {
+    name: "pvr_volcanic_pbestate.h",
+    out: [
+        "src/imagination/csbgen/volcanic/pbestate.h",
+    ],
+    srcs: [
+        "pbestate.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/volcanic",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location pbestate.xml) > " +
+        "$(location src/imagination/csbgen/volcanic/pbestate.h)",
+}
+
+genrule {
+    name: "pvr_volcanic_pds.h",
+    out: [
+        "src/imagination/csbgen/volcanic/pds.h",
+    ],
+    srcs: [
+        "pds.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/volcanic",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location pds.xml) > $(location " +
+        "src/imagination/csbgen/volcanic/pds.h)",
+}
+
+genrule {
+    name: "pvr_volcanic_texstate.h",
+    out: [
+        "src/imagination/csbgen/volcanic/texstate.h",
+    ],
+    srcs: [
+        "texstate.xml",
+    ],
+    tools: [
+        "gen_pack_header_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/imagination",
+        "src/imagination/csbgen",
+        "src/imagination/csbgen/volcanic",
+    ],
+    cmd: "$(location gen_pack_header_py_binary) $(location texstate.xml) > " +
+        "$(location src/imagination/csbgen/volcanic/texstate.h)",
+}

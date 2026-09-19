@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_libgallium_10",
+    srcs: [
+        "tgsi_aa_point.c",
+        "tgsi_build.c",
+        "tgsi_dump.c",
+        "tgsi_dynamic_indexing.c",
+        "tgsi_exec.c",
+        "tgsi_from_mesa.c",
+        "tgsi_info.c",
+        "tgsi_iterate.c",
+        "tgsi_parse.c",
+        "tgsi_point_sprite.c",
+        "tgsi_sanity.c",
+        "tgsi_scan.c",
+        "tgsi_strings.c",
+        "tgsi_text.c",
+        "tgsi_transform.c",
+        "tgsi_two_side.c",
+        "tgsi_ureg.c",
+        "tgsi_util.c",
+        "tgsi_vpos.c",
+    ],
+}
+
+cc_library_headers {
+    name: "inc_src_gallium_auxiliary_tgsi",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: select(arch(), {
+        "arm64": [
+            ".",
+        ],
+        "x86_64": [
+            ".",
+        ],
+        "x86": [
+            ".",
+        ],
+        default: [],
+    }),
+}

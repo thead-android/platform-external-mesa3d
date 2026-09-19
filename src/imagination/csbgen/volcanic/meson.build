@@ -13,7 +13,7 @@ pvr_xml_files = [
 foreach f : pvr_xml_files
   _name = '@0@.h'.format(f.split('.')[0])
   pvr_xml_pack += custom_target(
-    _name,
+    'pvr_volcanic_' + _name,
     input : ['../gen_pack_header.py', f],
     output : _name,
     command : [prog_python, '@INPUT@'],

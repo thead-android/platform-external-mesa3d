@@ -1,0 +1,100 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "_mesa_u_gralloc_c_flags",
+    vendor: true,
+    cflags: select(os(), {
+        "android": [
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "_mesa_u_gralloc_cpp_flags",
+    vendor: true,
+    cppflags: select(os(), {
+        "android": [
+            "-fvisibility=hidden",
+        ],
+        default: [],
+    }),
+}
+
+cc_defaults {
+    name: "c_args_for_u_gralloc",
+    vendor: true,
+    cflags: select(os(), {
+        "android": [
+            "-DUSE_IMAPPER4_METADATA_API",
+        ],
+        default: [],
+    }) + select((arch(), os()), {
+        ("arm64", "android"): [
+            "-DHAS_FREEDRENO",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "_mesa_u_gralloc",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "_mesa_u_gralloc_c_flags",
+        "_mesa_u_gralloc_cpp_flags",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "c_args_for_u_gralloc",
+    ],
+    header_libs: select(os(), {
+        "android": [
+            "hwvulkan_headers",
+            "inc_include",
+            "inc_util",
+        ],
+        default: [],
+    }),
+    srcs: select(os(), {
+        "android": [
+            "u_gralloc.c",
+            "u_gralloc_cros_api.c",
+            "u_gralloc_fallback.c",
+            "u_gralloc_imapper5_api.cpp",
+            "u_gralloc_internal.c",
+            "u_gralloc_libdrm.c",
+            "u_gralloc_qcom.c",
+        ],
+        default: [],
+    }),
+    shared_libs: select(os(), {
+        "android": [
+            "libcutils",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libui",
+        ],
+        default: [],
+    }),
+}

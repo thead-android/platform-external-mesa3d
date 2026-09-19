@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_defaults {
+    name: "mesa_util_c11_c_flags",
+    vendor: true,
+    host_supported: true,
+    cflags: [
+        "-fvisibility=hidden",
+    ],
+}
+
+cc_library_static {
+    name: "mesa_util_c11",
+    vendor: true,
+    c_std: "c11",
+    host_supported: true,
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "mesa_util_c11_c_flags",
+    ],
+    header_libs: [
+        "inc_util_c11",
+    ],
+    srcs: [
+        "time.c",
+    ] + select((arch(), os()), {
+        ("x86_64", "linux_glibc"): [
+            "threads_posix.c",
+        ],
+        ("x86_64", "linux_musl"): [
+            "threads_posix.c",
+        ],
+        ("arm64", "linux_musl"): [
+            "threads_posix.c",
+        ],
+        (default, default): [],
+    }),
+}

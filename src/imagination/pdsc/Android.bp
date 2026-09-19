@@ -1,0 +1,204 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_library_headers {
+    name: "inc_powervr_pdsc",
+    vendor: true,
+    export_include_dirs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ".",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "pdsc_precomp_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "pdsc_precomp_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "powervr_pdsc_c_flags",
+    vendor: true,
+    cflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-Wno-psabi",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_defaults {
+    name: "powervr_pdsc_cpp_flags",
+    vendor: true,
+    cppflags: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "-DXXH_FORCE_ALIGN_CHECK=0",
+            "-DXXH_FORCE_MEMORY_ACCESS=0",
+            "-fvisibility=hidden",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "pdsc_precomp",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "no_override_init_args",
+        "pdsc_precomp_c_flags",
+        "pdsc_precomp_cpp_flags",
+    ],
+    header_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "hwvulkan_headers",
+            "inc_imagination",
+            "inc_include",
+            "inc_src_imagination_android-precompiled_pdsc",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            ":pdsc_precomp_programs",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+}
+
+cc_library_static {
+    name: "powervr_pdsc",
+    vendor: true,
+    c_std: "c11",
+    cpp_std: "c++17",
+    defaults: [
+        "_trial_msvc",
+        "aosp_mesa3d_c_link_args",
+        "aosp_mesa3d_c_project_args",
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+        "no_override_init_args",
+        "powervr_pdsc_c_flags",
+        "powervr_pdsc_cpp_flags",
+    ],
+    header_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "hwvulkan_headers",
+            "inc_imagination",
+            "inc_include",
+            "inc_powervr_pdsc",
+            "inc_src",
+            "inc_util",
+            "inc_util_c11",
+        ],
+        (default, default): [],
+    }),
+    generated_headers: [
+        "shader_stats.h",
+        "u_format_gen.h",
+    ],
+    srcs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "pdsc.c",
+            "pdsc_binary.c",
+            "pdsc_debug.c",
+            "pdsc_ops.c",
+            "pdsc_print.c",
+            "pdsc_validate.c",
+        ],
+        (default, default): [],
+    }),
+    static_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "blake3",
+            "mesa_util",
+            "mesa_util_c11",
+            "mesa_util_simd",
+        ],
+        (default, default): [],
+    }),
+    shared_libs: select((arch(), os()), {
+        ("riscv64", "android"): [
+            "libcutils",
+            "libdrm",
+            "libhardware",
+            "liblog",
+            "libnativewindow",
+            "libsync",
+            "libz",
+            "libzstd",
+        ],
+        (default, default): [],
+    }),
+}

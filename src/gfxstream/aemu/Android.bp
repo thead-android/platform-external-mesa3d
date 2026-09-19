@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+cc_library_static {
+    name: "aemu",
+    vendor: true,
+    cpp_std: "c++17",
+    host_supported: true,
+    defaults: [
+        "aosp_mesa3d_cpp_link_args",
+        "aosp_mesa3d_cpp_project_args",
+    ],
+    header_libs: select(arch(), {
+        "arm64": [
+            "inc_aemu",
+        ],
+        "x86_64": [
+            "inc_aemu",
+        ],
+        "x86": [
+            "inc_aemu",
+        ],
+        default: [],
+    }),
+    srcs: select(arch(), {
+        "arm64": [
+            "Stream.cpp",
+            "ring_buffer.cpp",
+        ],
+        "x86_64": [
+            "Stream.cpp",
+            "ring_buffer.cpp",
+        ],
+        "x86": [
+            "Stream.cpp",
+            "ring_buffer.cpp",
+        ],
+        default: [],
+    }),
+}

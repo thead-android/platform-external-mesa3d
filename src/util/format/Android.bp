@@ -1,0 +1,111 @@
+/*
+ * Copyright (C) 2025-2026 The Magma GPU Project
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Generated via:
+ *   https://github.com/mesonbuild/meson/tree/master/mesonbuild/convert
+ *
+ * Submit patches, do not hand-edit.
+ *
+ */
+
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: ["external_mesa3d_license"],
+}
+
+filegroup {
+    name: "files_mesa_format",
+    srcs: [
+        "u_format.c",
+        "u_format_bptc.c",
+        "u_format_etc.c",
+        "u_format_fxt1.c",
+        "u_format_latc.c",
+        "u_format_other.c",
+        "u_format_rgtc.c",
+        "u_format_s3tc.c",
+        "u_format_tests.c",
+        "u_format_unpack_neon.c",
+        "u_format_yuv.c",
+        "u_format_zs.c",
+    ],
+}
+
+python_binary_host {
+    name: "u_format_table_py_binary",
+    main: "u_format_table.py",
+    srcs: [
+        "u_format_pack.py",
+        "u_format_parse.py",
+        "u_format_table.py",
+    ],
+    libs: [
+        "mako",
+        "pyyaml",
+    ],
+}
+
+genrule {
+    name: "u_format_gen.h",
+    out: [
+        "src/util/format/u_format_gen.h",
+    ],
+    srcs: [
+        "u_format.yaml",
+    ],
+    tools: [
+        "u_format_table_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/util",
+        "src/util/format",
+    ],
+    cmd: "$(location u_format_table_py_binary) $(location u_format.yaml) --enums " +
+        "> $(location src/util/format/u_format_gen.h)",
+}
+
+genrule {
+    name: "u_format_pack.h",
+    out: [
+        "src/util/format/u_format_pack.h",
+    ],
+    srcs: [
+        "u_format.yaml",
+    ],
+    tools: [
+        "u_format_table_py_binary",
+    ],
+    export_include_dirs: [
+        "src",
+        "src/util",
+        "src/util/format",
+    ],
+    cmd: "$(location u_format_table_py_binary) $(location u_format.yaml) " +
+        "--header > $(location src/util/format/u_format_pack.h)",
+}
+
+genrule {
+    name: "u_format_table.c",
+    out: [
+        "u_format_table.c",
+    ],
+    srcs: [
+        "u_format.yaml",
+    ],
+    tools: [
+        "u_format_table_py_binary",
+    ],
+    cmd: "$(location u_format_table_py_binary) $(location u_format.yaml) > " +
+        "$(location u_format_table.c)",
+}
+
+cc_library_headers {
+    name: "inc_src_util",
+    vendor: true,
+    host_supported: true,
+    export_include_dirs: [
+        ".",
+    ],
+}
