@@ -716,42 +716,40 @@ rust_defaults {
     name: "rust_2024_lint_args",
     vendor: true,
     host_supported: true,
-    flags: select(arch(), {
-        "arm64": [
+    arch: {
+        arm64: { flags: [
             "-Dunsafe_op_in_unsafe_fn",
-        ],
-        "x86_64": [
+        ] },
+        x86_64: { flags: [
             "-Dunsafe_op_in_unsafe_fn",
-        ],
-        "x86": [
+        ] },
+        x86: { flags: [
             "-Dunsafe_op_in_unsafe_fn",
-        ],
-        default: [],
-    }),
+        ] },
+    },
 }
 
 rust_defaults {
     name: "rust_global_args",
     vendor: true,
     host_supported: true,
-    flags: select(arch(), {
-        "arm64": [
+    arch: {
+        arm64: { flags: [
             "-Aclippy::collapsible_else_if",
             "-Aclippy::needless_lifetimes",
             "-Aclippy::question_mark",
-        ],
-        "x86_64": [
+        ] },
+        x86_64: { flags: [
             "-Aclippy::collapsible_else_if",
             "-Aclippy::needless_lifetimes",
             "-Aclippy::question_mark",
-        ],
-        "x86": [
+        ] },
+        x86: { flags: [
             "-Aclippy::collapsible_else_if",
             "-Aclippy::needless_lifetimes",
             "-Aclippy::question_mark",
-        ],
-        default: [],
-    }),
+        ] },
+    },
 }
 
 /*

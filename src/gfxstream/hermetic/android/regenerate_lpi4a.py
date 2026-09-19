@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -27,6 +28,18 @@ with tempfile.TemporaryDirectory(prefix='lpi4a-mesa-soong-') as temporary:
                 if content.count(token) != 1:
                     raise RuntimeError(name)
                 content = content.replace(token, token + '    lto: { never: true },\n')
+            def rust_arch_flags(match):
+                entries = re.findall(r'"(\w+)": (\[[^\]]*\]),', match[1])
+                if not entries or 'default: []' not in match[1]:
+                    raise RuntimeError(match[0])
+                return '    arch: {\n' + ''.join(
+                    '        ' + arch + ': { flags: ' + flags + ' },\n'
+                    for arch, flags in entries) + '    },'
+            content, count = re.subn(
+                r'    flags: select\(arch\(\), \{(.*?)\}\),',
+                rust_arch_flags, content, flags=re.S)
+            if count != 2:
+                raise RuntimeError(('rust_arch_flags', count))
         target = root/relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content)
