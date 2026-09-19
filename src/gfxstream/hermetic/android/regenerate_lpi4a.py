@@ -42,5 +42,18 @@ with tempfile.TemporaryDirectory(prefix='lpi4a-mesa-soong-') as temporary:
                 raise RuntimeError(('rust_arch_flags', count))
         target = root/relative
         target.parent.mkdir(parents=True, exist_ok=True)
+        for original in sorted(set(re.findall(r'"([A-Za-z_]\w*\.[A-Za-z_]\w*\.py)"', content))):
+            alias = original[:-3].replace('.', '_') + '.py'
+            link = target.parent/alias
+            if not (target.parent/original).is_file():
+                raise RuntimeError(original)
+            if link.is_symlink():
+                if str(link.readlink()) != original:
+                    raise RuntimeError(link)
+            elif link.exists():
+                raise RuntimeError(link)
+            else:
+                link.symlink_to(original)
+            content = content.replace('"' + original + '"', '"' + alias + '"')
         target.write_text(content)
     print('SOONG_FILES_GENERATED', len(files))

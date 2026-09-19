@@ -16,9 +16,9 @@ package {
 
 python_binary_host {
     name: "pco_builder_ops.h_py_binary",
-    main: "pco_builder_ops.h.py",
+    main: "pco_builder_ops_h.py",
     srcs: [
-        "pco_builder_ops.h.py",
+        "pco_builder_ops_h.py",
         "pco_isa.py",
         "pco_map.py",
         "pco_ops.py",
@@ -32,9 +32,9 @@ python_binary_host {
 
 python_binary_host {
     name: "pco_common.h_py_binary",
-    main: "pco_common.h.py",
+    main: "pco_common_h.py",
     srcs: [
-        "pco_common.h.py",
+        "pco_common_h.py",
         "pco_isa.py",
         "pco_map.py",
         "pco_ops.py",
@@ -48,9 +48,9 @@ python_binary_host {
 
 python_binary_host {
     name: "pco_info.c_py_binary",
-    main: "pco_info.c.py",
+    main: "pco_info_c.py",
     srcs: [
-        "pco_info.c.py",
+        "pco_info_c.py",
         "pco_isa.py",
         "pco_map.py",
         "pco_ops.py",
@@ -64,9 +64,9 @@ python_binary_host {
 
 python_binary_host {
     name: "pco_isa.h_py_binary",
-    main: "pco_isa.h.py",
+    main: "pco_isa_h.py",
     srcs: [
-        "pco_isa.h.py",
+        "pco_isa_h.py",
         "pco_isa.py",
         "pco_map.py",
         "pco_ops.py",
@@ -80,10 +80,10 @@ python_binary_host {
 
 python_binary_host {
     name: "pco_map.h_py_binary",
-    main: "pco_map.h.py",
+    main: "pco_map_h.py",
     srcs: [
         "pco_isa.py",
-        "pco_map.h.py",
+        "pco_map_h.py",
         "pco_map.py",
         "pco_ops.py",
         "pco_pygen_common.py",
@@ -110,11 +110,11 @@ python_binary_host {
 
 python_binary_host {
     name: "pco_ops.h_py_binary",
-    main: "pco_ops.h.py",
+    main: "pco_ops_h.py",
     srcs: [
         "pco_isa.py",
         "pco_map.py",
-        "pco_ops.h.py",
+        "pco_ops_h.py",
         "pco_ops.py",
         "pco_pygen_common.py",
     ],
